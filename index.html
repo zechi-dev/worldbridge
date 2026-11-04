@@ -239,7 +239,7 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
     </div>
   </section>
 
-  <!-- VIEW 4 — WORKER DASHBOARD (NEW!) -->
+  <!-- VIEW 4 — WORKER DASHBOARD -->
   <section id="view-worker-dash" class="view hidden">
     <header class="sticky top-0 z-30 bg-navy/85 backdrop-blur-xl border-b border-white/10">
       <div class="max-w-md mx-auto px-5 py-3 flex items-center justify-between">
@@ -254,8 +254,6 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
       </div>
     </header>
     <div class="max-w-md mx-auto px-5 pt-5 safe-bottom">
-      
-      <!-- Profile Card -->
       <div class="card p-4">
         <div class="flex items-center gap-3">
           <div class="w-12 h-12 rounded-full bg-gold/15 border border-gold/25 flex items-center justify-center text-gold text-xl font-black" id="workerInitial">M</div>
@@ -266,8 +264,6 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
           <span class="text-[9px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/25" id="workerStatus">ACTIVE</span>
         </div>
       </div>
-
-      <!-- CV Update -->
       <div class="mt-4">
         <h2 class="text-sm font-extrabold tracking-tight mb-2">My CV / Resume</h2>
         <div class="card p-4">
@@ -279,15 +275,12 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
           <p id="cvStatus" class="text-[10px] text-slate-500 mt-2">No CV uploaded yet.</p>
         </div>
       </div>
-
-      <!-- Interview Notifications -->
       <div class="mt-6 mb-6">
         <h2 class="text-sm font-extrabold tracking-tight mb-2">Interview Invitations</h2>
         <div id="interviewsList" class="space-y-2">
           <p class="text-[11.5px] text-slate-500 text-center py-4">Checking for updates...</p>
         </div>
       </div>
-
     </div>
   </section>
 
@@ -309,19 +302,22 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
       </div>
       <form id="employerForm" class="mt-5 space-y-4" autocomplete="on">
         <div><label class="label" for="companyName">Company Name *</label><input class="input" id="companyName" name="companyName" type="text" placeholder="e.g. Al Futtaim Recruitment LLC" autocomplete="organization" required></div>
-        <div><label class="label" for="licenseNumber">Business License Number *</label><input class="input" id="licenseNumber" name="licenseNumber" type="text" placeholder="e.g. DED-123456" required></div>
-        <div><label class="label" for="officeAddress">Office Address *</label><input class="input" id="officeAddress" name="officeAddress" type="text" placeholder="e.g. Business Bay, Dubai" required></div>
-        <div><label class="label" for="employerEmail">Email *</label><input class="input" id="employerEmail" name="employerEmail" type="email" placeholder="office@company.com" autocomplete="email" required></div>
+        
+        <div><label class="label" for="employerEmail">Email <span class="text-slate-600 normal-case font-medium">(optional)</span></label><input class="input" id="employerEmail" name="employerEmail" type="email" placeholder="office@company.com" autocomplete="email"></div>
+        
         <div>
-          <label class="label" for="employerPhone">Phone Number *</label>
+          <label class="label" for="employerPhone">WhatsApp / Phone Number *</label>
           <div class="flex gap-2">
             <input class="input" id="employerPhone" name="employerPhone" type="tel" placeholder="+971 50 123 4567" autocomplete="tel" inputmode="tel" required>
             <button type="button" id="tgPhoneBtnEmployer" class="shrink-0 px-3.5 rounded-xl bg-white/5 border border-white/10 text-gold active:scale-95 transition flex items-center justify-center" title="Use Telegram number">
               <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.12 4.2 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.1 9.9a16 16 0 0 0 6 6l1.26-1.26a2 2 0 0 1 2.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92Z"/></svg>
             </button>
           </div>
-          <p class="text-[10px] text-slate-500 mt-1.5">Tap the icon to use your Telegram number.</p>
         </div>
+
+        <div><label class="label" for="officeAddress">City / Office Address <span class="text-slate-600 normal-case font-medium">(Optional)</span></label><input class="input" id="officeAddress" name="officeAddress" type="text" placeholder="e.g. Business Bay, Dubai"></div>
+        <div><label class="label" for="licenseNumber">Trade License No. <span class="text-slate-600 normal-case font-medium">(Optional - add later for verified badge)</span></label><input class="input" id="licenseNumber" name="licenseNumber" type="text" placeholder="e.g. DED-123456"></div>
+
         <div>
           <label class="label">Roles You Recruit For *</label>
           <p class="text-[10px] text-slate-500 -mt-1 mb-2">Select all that apply.</p>
@@ -338,9 +334,9 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
         </div>
         <div id="employerError" class="hidden rounded-xl bg-red-500/10 border border-red-500/30 px-4 py-3"><p class="text-[11.5px] text-red-300 font-medium leading-relaxed" id="employerErrorText"></p></div>
         <button id="employerSubmitBtn" type="submit" class="w-full rounded-2xl bg-gold text-navy font-extrabold text-[15px] py-4 shadow-xl shadow-gold/25 active:scale-[0.98] transition flex items-center justify-center gap-2.5 disabled:opacity-70 disabled:active:scale-100">
-          <span id="employerSpinner" class="spinner hidden"></span><span id="employerBtnText">Create Recruitment Account</span>
+          <span id="employerSpinner" class="spinner hidden"></span><span id="employerBtnText">Create Account & Get 1 Free Lead</span>
         </button>
-        <p class="text-center text-[10px] text-slate-500 pb-2">We use these details to verify your agency and send payment receipts.</p>
+        <p class="text-center text-[10px] text-slate-500 pb-2">We use these details to send you payment receipts and lead invoices.</p>
       </form>
     </div>
   </section>
@@ -360,6 +356,18 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
       </div>
     </header>
     <div class="max-w-md mx-auto px-5 pt-5 safe-bottom">
+      
+      <!-- Verification Banner -->
+      <div id="verificationBanner" class="card p-3 mb-4 border-gold/30 bg-gold/[0.05] hidden">
+        <div class="flex items-center justify-between gap-3">
+          <div>
+            <p class="text-[12px] font-extrabold text-gold">Get Verified Badge</p>
+            <p class="text-[10px] text-slate-400 mt-0.5">Upload Trade License for priority support.</p>
+          </div>
+          <button type="button" onclick="openVerifyModal()" class="text-[10px] font-extrabold bg-gold text-navy px-3 py-1.5 rounded-lg shrink-0 active:scale-95 transition">Add License</button>
+        </div>
+      </div>
+
       <div class="grid grid-cols-2 gap-3">
         <div class="card p-4"><p class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Credits</p><p class="mt-1 text-[26px] font-extrabold text-gold leading-none" id="dashCredits">0</p><p class="text-[10px] text-slate-500 mt-1">1 credit = 1 unlock</p></div>
         <div class="card p-4"><p class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Available Leads</p><p class="mt-1 text-[26px] font-extrabold text-white leading-none" id="dashCount">—</p><p class="text-[10px] text-slate-500 mt-1">Verified workers</p></div>
@@ -466,6 +474,32 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
   </div>
 </div>
 
+<!-- VERIFY LICENSE MODAL -->
+<div id="verifyModal" class="fixed inset-0 z-50 hidden">
+  <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" data-close-verify-modal></div>
+  <div class="absolute inset-x-0 bottom-0">
+    <div class="max-w-md mx-auto bg-navysoft border-t border-white/10 rounded-t-3xl p-6 safe-bottom fade-in">
+      <div class="w-10 h-1 rounded-full bg-white/20 mx-auto mb-5"></div>
+      <div class="flex items-center gap-3">
+        <div class="w-11 h-11 rounded-xl bg-gold/15 border border-gold/25 flex items-center justify-center shrink-0 text-gold text-xl font-black">🛡️</div>
+        <div><p class="font-extrabold text-[15px]">Get Verified</p><p class="text-[11px] text-slate-400">Add Trade License for priority support</p></div>
+      </div>
+      <div class="mt-4 space-y-3">
+        <div>
+          <label class="label" for="verifyAddress">City / Office Address</label>
+          <input type="text" id="verifyAddress" class="input" placeholder="e.g. Business Bay, Dubai">
+        </div>
+        <div>
+          <label class="label" for="verifyLicense">Trade License Number *</label>
+          <input type="text" id="verifyLicense" class="input" placeholder="e.g. DED-123456">
+        </div>
+      </div>
+      <button type="button" id="saveVerifyBtn" class="mt-5 w-full rounded-2xl bg-gold text-navy font-extrabold text-[14px] py-3.5 shadow-lg shadow-gold/20">Save & Verify</button>
+      <button type="button" data-close-verify-modal class="mt-2 w-full rounded-2xl bg-white/5 border border-white/10 text-slate-300 font-bold text-[13px] py-3">Cancel</button>
+    </div>
+  </div>
+</div>
+
 <script>
   /* ============ CONFIG ============ */
   const SUPABASE_URL = "https://fnpccciwbwrragpnzyqc.supabase.co";
@@ -548,6 +582,7 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
   const buyCreditsBtn = document.getElementById('buyCreditsBtn');
   const hiringFocus = document.getElementById('hiringFocus');
   const hiringChips = document.getElementById('hiringFocusChips');
+  const verificationBanner = document.getElementById('verificationBanner');
   
   // Worker Dashboard Elements
   const workerInitial = document.getElementById('workerInitial');
@@ -565,6 +600,12 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
   const intMessage = document.getElementById('intMessage');
   const sendInterviewBtn = document.getElementById('sendInterviewBtn');
 
+  // Verify Modal Elements
+  const verifyModal = document.getElementById('verifyModal');
+  const verifyAddress = document.getElementById('verifyAddress');
+  const verifyLicense = document.getElementById('verifyLicense');
+  const saveVerifyBtn = document.getElementById('saveVerifyBtn');
+
   /* ============ STORAGE ============ */
   function safeGet(k){try{return localStorage.getItem(k);}catch(e){return null;}}
   function safeSet(k,v){try{localStorage.setItem(k,v);}catch(e){}}
@@ -574,7 +615,6 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
   /* ============ ROLE & INIT ============ */
   roleWorker.addEventListener('click', async function(){ 
     safeSet('wb_role','worker'); 
-    // Check if worker already has a profile
     if (TG_USER_ID) {
       try {
         const res = await fetch(SUPABASE_URL + '/rest/v1/rpc/get_worker_profile', {
@@ -783,6 +823,8 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
     const phone = val(fd,'employerPhone');
     const jobs = fd.getAll('employerJobs').map(j => String(j).trim()).filter(Boolean);
     if (!jobs.length) { showBox(empError, empErrorText, 'Please select at least one role you recruit for.'); return; }
+    
+    // Give 1 Free Credit!
     const payload = { 
       company_name: companyName, 
       license_number: licenseNumber,
@@ -790,9 +832,10 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
       email, phone, jobs, 
       telegram_id: TG_USER_ID, 
       role: 'employer', 
-      credits: 0 
+      credits: 1 
     };
-    setLoading(empSubmitBtn, empSpinner, empBtnText, true, 'Create Recruitment Account', 'Creating…');
+    
+    setLoading(empSubmitBtn, empSpinner, empBtnText, true, 'Create Account & Get 1 Free Lead', 'Creating…');
     try {
       const res = await fetch(SUPABASE_URL + '/rest/v1/employer_registrations', {
         method: 'POST',
@@ -803,11 +846,12 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
       safeSet('wb_employer_name', companyName || 'Recruitment');
       safeSet('wb_employer_email', email || '');
       safeSetJSON('wb_employer_jobs', jobs);
+      safeSet('wb_has_license', licenseNumber ? 'yes' : 'no');
       employerForm.reset();
-      setLoading(empSubmitBtn, empSpinner, empBtnText, false, 'Create Recruitment Account', 'Creating…');
+      setLoading(empSubmitBtn, empSpinner, empBtnText, false, 'Create Account & Get 1 Free Lead', 'Creating…');
       showView('view-employer-dash');
     } catch(err) {
-      setLoading(empSubmitBtn, empSpinner, empBtnText, false, 'Create Recruitment Account', 'Creating…');
+      setLoading(empSubmitBtn, empSpinner, empBtnText, false, 'Create Account & Get 1 Free Lead', 'Creating…');
       showBox(empError, empErrorText, 'Could not create your account. Please check your connection and try again.');
       console.error('[WorldBridge] employer reg error:', err);
     }
@@ -816,6 +860,14 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
   /* ============ EMPLOYER DASHBOARD ============ */
   async function hydrateDashboardHeader() {
     dashCompany.textContent = safeGet('wb_employer_name') || 'Recruitment';
+    
+    // Check verification banner
+    if (safeGet('wb_has_license') === 'no' || safeGet('wb_has_license') === null) {
+      verificationBanner.classList.remove('hidden');
+    } else {
+      verificationBanner.classList.add('hidden');
+    }
+
     if (TG_USER_ID) {
       try {
         const res = await fetch(SUPABASE_URL + '/rest/v1/rpc/get_my_credits', {
@@ -829,6 +881,7 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
         }
       } catch(e){}
     }
+    
     const savedJobs = safeGetJSON('wb_employer_jobs');
     hiringChips.innerHTML = '';
     if (Array.isArray(savedJobs) && savedJobs.length) {
@@ -892,12 +945,59 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
     leadsList.querySelectorAll('[data-interview]').forEach(btn => btn.addEventListener('click', () => openInterviewModal(btn.dataset.interview)));
   }
 
+  /* ============ VERIFY LICENSE ============ */
+  window.openVerifyModal = function() {
+    verifyModal.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeVerifyModal() {
+    verifyModal.classList.add('hidden');
+    document.body.style.overflow = '';
+  }
+
+  verifyModal.querySelectorAll('[data-close-verify-modal]').forEach(el => el.addEventListener('click', closeVerifyModal));
+
+  saveVerifyBtn.addEventListener('click', async function() {
+    const lic = verifyLicense.value.trim();
+    const addr = verifyAddress.value.trim();
+    if (!lic) return alert('Please enter your Trade License Number');
+    this.textContent = 'Saving...';
+    this.disabled = true;
+
+    try {
+      const res = await fetch(SUPABASE_URL + '/rest/v1/rpc/update_employer_license', {
+        method: 'POST',
+        headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tg_id: TG_USER_ID, new_license: lic, new_address: addr })
+      });
+      if (!res.ok) throw new Error(await res.text());
+      
+      safeSet('wb_has_license', 'yes');
+      this.textContent = 'Verified!';
+      setTimeout(() => {
+        closeVerifyModal();
+        this.textContent = 'Save & Verify';
+        this.disabled = false;
+        verificationBanner.classList.add('hidden');
+        alert('Trade License submitted! You now have the Verified Badge.');
+      }, 1000);
+
+    } catch(e) {
+      console.error(e);
+      this.textContent = 'Error';
+      setTimeout(() => {
+        this.textContent = 'Save & Verify';
+        this.disabled = false;
+      }, 2000);
+    }
+  });
+
   /* ============ SCHEDULE INTERVIEW ============ */
   function openInterviewModal(id) {
     currentWorkerId = id;
     interviewModal.classList.remove('hidden');
     document.body.style.overflow = 'hidden';
-    // Set default date to tomorrow 10:00 AM
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
     tomorrow.setHours(10, 0, 0, 0);
@@ -1054,7 +1154,6 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
   (function init(){
     const savedRole = safeGet('wb_role');
     if (savedRole === 'worker') {
-      // If worker, check if they have a profile, then show dashboard or welcome
       if (TG_USER_ID) {
         fetch(SUPABASE_URL + '/rest/v1/rpc/get_worker_profile', {
           method: 'POST',
