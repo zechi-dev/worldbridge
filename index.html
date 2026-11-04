@@ -239,7 +239,59 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
     </div>
   </section>
 
-  <!-- VIEW 4 — EMPLOYER REGISTER -->
+  <!-- VIEW 4 — WORKER DASHBOARD (NEW!) -->
+  <section id="view-worker-dash" class="view hidden">
+    <header class="sticky top-0 z-30 bg-navy/85 backdrop-blur-xl border-b border-white/10">
+      <div class="max-w-md mx-auto px-5 py-3 flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-gold flex items-center justify-center text-navy font-black text-lg shadow-lg shadow-gold/20">W</div>
+          <div class="leading-tight">
+            <p class="font-extrabold tracking-tight text-[15px]">Worker Dashboard</p>
+            <p class="text-[9px] text-gold font-bold tracking-[0.18em] uppercase">My Profile</p>
+          </div>
+        </div>
+        <button type="button" data-switch-role class="text-[10px] font-extrabold px-2.5 py-1.5 rounded-full bg-white/5 border border-white/10 text-slate-300 active:scale-95 transition shrink-0">Switch</button>
+      </div>
+    </header>
+    <div class="max-w-md mx-auto px-5 pt-5 safe-bottom">
+      
+      <!-- Profile Card -->
+      <div class="card p-4">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 rounded-full bg-gold/15 border border-gold/25 flex items-center justify-center text-gold text-xl font-black" id="workerInitial">M</div>
+          <div class="flex-1 min-w-0">
+            <p class="text-[15px] font-extrabold truncate" id="workerName">Loading...</p>
+            <p class="text-[11.5px] text-slate-400 truncate" id="workerJob">Loading...</p>
+          </div>
+          <span class="text-[9px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/25" id="workerStatus">ACTIVE</span>
+        </div>
+      </div>
+
+      <!-- CV Update -->
+      <div class="mt-4">
+        <h2 class="text-sm font-extrabold tracking-tight mb-2">My CV / Resume</h2>
+        <div class="card p-4">
+          <label class="label" for="updateCvLink">CV Link (Google Drive, Dropbox, etc.)</label>
+          <div class="flex gap-2">
+            <input class="input" id="updateCvLink" type="text" placeholder="Paste link here...">
+            <button id="updateCvBtn" class="shrink-0 px-4 rounded-xl bg-gold text-navy font-extrabold text-[12px] active:scale-95 transition">Save</button>
+          </div>
+          <p id="cvStatus" class="text-[10px] text-slate-500 mt-2">No CV uploaded yet.</p>
+        </div>
+      </div>
+
+      <!-- Interview Notifications -->
+      <div class="mt-6 mb-6">
+        <h2 class="text-sm font-extrabold tracking-tight mb-2">Interview Invitations</h2>
+        <div id="interviewsList" class="space-y-2">
+          <p class="text-[11.5px] text-slate-500 text-center py-4">Checking for updates...</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- VIEW 5 — EMPLOYER REGISTER -->
   <section id="view-employer-reg" class="view hidden">
     <header class="sticky top-0 z-30 bg-navy/85 backdrop-blur-xl border-b border-white/10">
       <div class="max-w-md mx-auto px-5 py-3 flex items-center gap-3">
@@ -293,7 +345,7 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
     </div>
   </section>
 
-  <!-- VIEW 5 — EMPLOYER DASHBOARD -->
+  <!-- VIEW 6 — EMPLOYER DASHBOARD -->
   <section id="view-employer-dash" class="view hidden">
     <header class="sticky top-0 z-30 bg-navy/85 backdrop-blur-xl border-b border-white/10">
       <div class="max-w-md mx-auto px-5 py-3 flex items-center justify-between gap-3">
@@ -388,6 +440,32 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
   </div>
 </div>
 
+<!-- SCHEDULE INTERVIEW MODAL -->
+<div id="interviewModal" class="fixed inset-0 z-50 hidden">
+  <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" data-close-int-modal></div>
+  <div class="absolute inset-x-0 bottom-0">
+    <div class="max-w-md mx-auto bg-navysoft border-t border-white/10 rounded-t-3xl p-6 safe-bottom fade-in">
+      <div class="w-10 h-1 rounded-full bg-white/20 mx-auto mb-5"></div>
+      <div class="flex items-center gap-3">
+        <div class="w-11 h-11 rounded-xl bg-gold/15 border border-gold/25 flex items-center justify-center shrink-0 text-gold text-xl font-black">📅</div>
+        <div><p class="font-extrabold text-[15px]">Schedule Interview</p><p class="text-[11px] text-slate-400">Send an invitation to this worker</p></div>
+      </div>
+      <div class="mt-4 space-y-3">
+        <div>
+          <label class="label" for="intDate">Interview Date & Time *</label>
+          <input type="datetime-local" id="intDate" class="input" required>
+        </div>
+        <div>
+          <label class="label" for="intMessage">Message (Optional)</label>
+          <input type="text" id="intMessage" class="input" placeholder="e.g. Please bring your original passport">
+        </div>
+      </div>
+      <button type="button" id="sendInterviewBtn" class="mt-5 w-full rounded-2xl bg-gold text-navy font-extrabold text-[14px] py-3.5 shadow-lg shadow-gold/20">Send Invitation (Free)</button>
+      <button type="button" data-close-int-modal class="mt-2 w-full rounded-2xl bg-white/5 border border-white/10 text-slate-300 font-bold text-[13px] py-3">Cancel</button>
+    </div>
+  </div>
+</div>
+
 <script>
   /* ============ CONFIG ============ */
   const SUPABASE_URL = "https://fnpccciwbwrragpnzyqc.supabase.co";
@@ -401,6 +479,7 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
     { id: 'p25', credits: 25, price: 350, label: 'Pro',      desc: '25 worker contacts' }
   ];
   let currentOrder = null;
+  let currentWorkerId = null; // For scheduling interviews
 
   /* ============ TELEGRAM ============ */
   const tg = (window.Telegram && window.Telegram.WebApp) ? window.Telegram.WebApp : null;
@@ -414,7 +493,7 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
   const TG_USER_ID = (tg && tg.initDataUnsafe && tg.initDataUnsafe.user && tg.initDataUnsafe.user.id) ? tg.initDataUnsafe.user.id : null;
 
   /* ============ VIEWS ============ */
-  const VIEWS = ['view-role','view-welcome','view-form','view-success','view-employer-reg','view-employer-dash'];
+  const VIEWS = ['view-role','view-welcome','view-form','view-success','view-worker-dash','view-employer-reg','view-employer-dash'];
   function showView(id) {
     VIEWS.forEach(function (v) {
       const el = document.getElementById(v);
@@ -425,11 +504,12 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
     window.scrollTo(0, 0);
     if (tg && tg.BackButton) {
       try {
-        if (id === 'view-role' || id === 'view-welcome' || id === 'view-success' || id === 'view-employer-dash') tg.BackButton.hide();
+        if (id === 'view-role' || id === 'view-welcome' || id === 'view-success' || id === 'view-worker-dash' || id === 'view-employer-dash') tg.BackButton.hide();
         else tg.BackButton.show();
       } catch (e) {}
     }
     if (id === 'view-employer-dash') { hydrateDashboardHeader(); loadLeads(); }
+    if (id === 'view-worker-dash') { loadWorkerDashboard(); }
   }
 
   /* ============ ELEMENTS ============ */
@@ -468,6 +548,22 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
   const buyCreditsBtn = document.getElementById('buyCreditsBtn');
   const hiringFocus = document.getElementById('hiringFocus');
   const hiringChips = document.getElementById('hiringFocusChips');
+  
+  // Worker Dashboard Elements
+  const workerInitial = document.getElementById('workerInitial');
+  const workerName = document.getElementById('workerName');
+  const workerJob = document.getElementById('workerJob');
+  const workerStatus = document.getElementById('workerStatus');
+  const updateCvLink = document.getElementById('updateCvLink');
+  const updateCvBtn = document.getElementById('updateCvBtn');
+  const cvStatus = document.getElementById('cvStatus');
+  const interviewsList = document.getElementById('interviewsList');
+
+  // Interview Modal Elements
+  const interviewModal = document.getElementById('interviewModal');
+  const intDate = document.getElementById('intDate');
+  const intMessage = document.getElementById('intMessage');
+  const sendInterviewBtn = document.getElementById('sendInterviewBtn');
 
   /* ============ STORAGE ============ */
   function safeGet(k){try{return localStorage.getItem(k);}catch(e){return null;}}
@@ -475,13 +571,33 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
   function safeGetJSON(k){try{const r=localStorage.getItem(k);return r?JSON.parse(r):null;}catch(e){return null;}}
   function safeSetJSON(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
 
-  /* ============ ROLE ============ */
-  roleWorker.addEventListener('click', function(){ safeSet('wb_role','worker'); showView('view-welcome'); });
+  /* ============ ROLE & INIT ============ */
+  roleWorker.addEventListener('click', async function(){ 
+    safeSet('wb_role','worker'); 
+    // Check if worker already has a profile
+    if (TG_USER_ID) {
+      try {
+        const res = await fetch(SUPABASE_URL + '/rest/v1/rpc/get_worker_profile', {
+          method: 'POST',
+          headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ tg_id: TG_USER_ID })
+        });
+        const profiles = await res.json();
+        if (profiles && profiles.length > 0) {
+          showView('view-worker-dash');
+          return;
+        }
+      } catch(e) { console.error(e); }
+    }
+    showView('view-welcome'); 
+  });
+
   roleEmployer.addEventListener('click', function(){
     safeSet('wb_role','employer');
     if (safeGet('wb_employer_name')) showView('view-employer-dash');
     else showView('view-employer-reg');
   });
+  
   backRoleBtns.forEach(b => b.addEventListener('click', () => showView('view-role')));
   switchBtns.forEach(b => b.addEventListener('click', function(){
     try{localStorage.removeItem('wb_role');}catch(e){}
@@ -494,8 +610,9 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
   backBtns.forEach(b => b.addEventListener('click', () => showView('view-welcome')));
   closeBtn.addEventListener('click', function(){
     if (tg && typeof tg.close === 'function') { try { tg.close(); return; } catch(e){} }
-    showView('view-welcome');
+    showView('view-role');
   });
+  
   if (tg && tg.BackButton) {
     try {
       tg.BackButton.onClick(function(){
@@ -582,6 +699,77 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
     }
   });
 
+  /* ============ WORKER DASHBOARD ============ */
+  async function loadWorkerDashboard() {
+    if (!TG_USER_ID) return;
+    try {
+      const res = await fetch(SUPABASE_URL + '/rest/v1/rpc/get_worker_profile', {
+        method: 'POST',
+        headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tg_id: TG_USER_ID })
+      });
+      const profiles = await res.json();
+      if (profiles && profiles.length > 0) {
+        const p = profiles[0];
+        workerInitial.textContent = p.name.charAt(0).toUpperCase();
+        workerName.textContent = p.name;
+        workerJob.textContent = p.job + ' · ' + p.location;
+        workerStatus.textContent = p.status.toUpperCase();
+        if (p.cv) {
+          updateCvLink.value = p.cv;
+          cvStatus.innerHTML = '<a href="' + p.cv + '" target="_blank" class="text-gold underline">View Current CV</a>';
+        } else {
+          cvStatus.textContent = 'No CV uploaded yet.';
+        }
+      }
+    } catch(e) { console.error('Profile load error', e); }
+
+    loadWorkerInterviews();
+  }
+
+  async function loadWorkerInterviews() {
+    if (!TG_USER_ID) return;
+    try {
+      const res = await fetch(SUPABASE_URL + '/rest/v1/rpc/get_worker_interviews', {
+        method: 'POST',
+        headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tg_id: TG_USER_ID })
+      });
+      const interviews = await res.json();
+      if (interviews && interviews.length > 0) {
+        interviewsList.innerHTML = interviews.map(i => {
+          const date = new Date(i.interview_date).toLocaleString();
+          return '<div class="card p-4 border-l-4 border-gold">' +
+            '<p class="text-[13px] font-extrabold text-gold">' + i.company_name + '</p>' +
+            '<p class="text-[11.5px] text-slate-300 mt-1">📅 ' + date + '</p>' +
+            (i.message ? '<p class="text-[10.5px] text-slate-400 mt-2 bg-white/5 p-2 rounded-lg">"' + i.message + '"</p>' : '') +
+          '</div>';
+        }).join('');
+      } else {
+        interviewsList.innerHTML = '<div class="card p-5 text-center"><p class="text-[11.5px] text-slate-400">No interview invitations yet.</p></div>';
+      }
+    } catch(e) { console.error('Interviews load error', e); }
+  }
+
+  updateCvBtn.addEventListener('click', async function() {
+    const newCv = updateCvLink.value.trim();
+    if (!newCv || !TG_USER_ID) return;
+    this.textContent = '...';
+    try {
+      await fetch(SUPABASE_URL + '/rest/v1/rpc/update_worker_cv', {
+        method: 'POST',
+        headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tg_id: TG_USER_ID, new_cv: newCv })
+      });
+      this.textContent = 'Saved!';
+      cvStatus.innerHTML = '<a href="' + newCv + '" target="_blank" class="text-gold underline">View Current CV</a>';
+      setTimeout(() => this.textContent = 'Save', 2000);
+    } catch(e) {
+      this.textContent = 'Error';
+      setTimeout(() => this.textContent = 'Save', 2000);
+    }
+  });
+
   /* ============ EMPLOYER REGISTER ============ */
   employerForm.addEventListener('submit', async function(e){
     e.preventDefault();
@@ -599,9 +787,7 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
       company_name: companyName, 
       license_number: licenseNumber,
       office_address: officeAddress,
-      email, 
-      phone, 
-      jobs, 
+      email, phone, jobs, 
       telegram_id: TG_USER_ID, 
       role: 'employer', 
       credits: 0 
@@ -627,7 +813,7 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
     }
   });
 
-  /* ============ DASHBOARD ============ */
+  /* ============ EMPLOYER DASHBOARD ============ */
   async function hydrateDashboardHeader() {
     dashCompany.textContent = safeGet('wb_employer_name') || 'Recruitment';
     if (TG_USER_ID) {
@@ -695,11 +881,73 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
           '<div class="rounded-lg bg-white/5 px-2.5 py-2"><p class="text-[9px] font-bold uppercase tracking-wider text-slate-500">Qualification</p><p class="text-[11.5px] font-bold text-slate-300 mt-0.5 truncate">' + escapeHtml(lead.qualification) + '</p></div>' +
           '<div class="rounded-lg bg-white/5 px-2.5 py-2"><p class="text-[9px] font-bold uppercase tracking-wider text-slate-500">Ready</p><p class="text-[11.5px] font-bold text-slate-300 mt-0.5 truncate">' + escapeHtml(lead.ready) + '</p></div>' +
         '</div>' +
-        '<button type="button" class="mt-3 w-full rounded-xl bg-gold/15 border border-gold/30 text-gold font-extrabold text-[12px] py-2.5 active:scale-[0.98] transition" data-unlock="' + escapeHtml(lead.id) + '">Unlock Full Details</button>' +
+        '<div class="mt-3 flex gap-2">' +
+          '<button type="button" class="flex-1 rounded-xl bg-gold/15 border border-gold/30 text-gold font-extrabold text-[12px] py-2.5 active:scale-[0.98] transition" data-unlock="' + escapeHtml(lead.id) + '">Unlock Details</button>' +
+          '<button type="button" class="flex-1 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 font-extrabold text-[12px] py-2.5 active:scale-[0.98] transition" data-interview="' + escapeHtml(lead.id) + '">Schedule Interview</button>' +
+        '</div>' +
       '</div>';
     }).join('');
+    
     leadsList.querySelectorAll('[data-unlock]').forEach(btn => btn.addEventListener('click', openUsdtModal));
+    leadsList.querySelectorAll('[data-interview]').forEach(btn => btn.addEventListener('click', () => openInterviewModal(btn.dataset.interview)));
   }
+
+  /* ============ SCHEDULE INTERVIEW ============ */
+  function openInterviewModal(id) {
+    currentWorkerId = id;
+    interviewModal.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+    // Set default date to tomorrow 10:00 AM
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setHours(10, 0, 0, 0);
+    intDate.value = tomorrow.toISOString().slice(0, 16);
+  }
+
+  function closeInterviewModal() {
+    interviewModal.classList.add('hidden');
+    document.body.style.overflow = '';
+    currentWorkerId = null;
+  }
+
+  interviewModal.querySelectorAll('[data-close-int-modal]').forEach(el => el.addEventListener('click', closeInterviewModal));
+
+  sendInterviewBtn.addEventListener('click', async function() {
+    if (!currentWorkerId || !intDate.value) return;
+    this.textContent = 'Sending...';
+    this.disabled = true;
+
+    try {
+      const res = await fetch(SUPABASE_URL + '/rest/v1/rpc/schedule_interview', {
+        method: 'POST',
+        headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          worker_id: currentWorkerId,
+          emp_tg_id: TG_USER_ID,
+          emp_name: safeGet('wb_employer_name') || 'Recruitment Office',
+          int_date: new Date(intDate.value).toISOString(),
+          msg: intMessage.value.trim() || null
+        })
+      });
+      if (!res.ok) throw new Error(await res.text());
+      
+      this.textContent = 'Sent!';
+      setTimeout(() => {
+        closeInterviewModal();
+        this.textContent = 'Send Invitation (Free)';
+        this.disabled = false;
+        alert('Interview invitation sent to the worker successfully!');
+      }, 1000);
+
+    } catch(e) {
+      console.error(e);
+      this.textContent = 'Error';
+      setTimeout(() => {
+        this.textContent = 'Send Invitation (Free)';
+        this.disabled = false;
+      }, 2000);
+    }
+  });
 
   /* ============ USDT MODAL ============ */
   function openUsdtModal() {
@@ -805,11 +1053,26 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
   /* ============ INIT ============ */
   (function init(){
     const savedRole = safeGet('wb_role');
-    if (savedRole === 'worker') showView('view-welcome');
-    else if (savedRole === 'employer') {
+    if (savedRole === 'worker') {
+      // If worker, check if they have a profile, then show dashboard or welcome
+      if (TG_USER_ID) {
+        fetch(SUPABASE_URL + '/rest/v1/rpc/get_worker_profile', {
+          method: 'POST',
+          headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ tg_id: TG_USER_ID })
+        }).then(res => res.json()).then(profiles => {
+          if (profiles && profiles.length > 0) showView('view-worker-dash');
+          else showView('view-welcome');
+        }).catch(() => showView('view-welcome'));
+      } else {
+        showView('view-welcome');
+      }
+    } else if (savedRole === 'employer') {
       if (safeGet('wb_employer_name')) showView('view-employer-dash');
       else showView('view-employer-reg');
-    } else showView('view-role');
+    } else {
+      showView('view-role');
+    }
   })();
 </script>
 </body>
