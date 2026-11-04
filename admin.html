@@ -20,7 +20,7 @@ tr:hover{background:rgba(255,255,255,.02)}
 </head>
 <body class="bg-navy text-white min-h-screen">
 
-<!-- ADMIN PASSWORD: Ikechukwusia1# (also check SQL functions — must match) -->
+<!-- ADMIN PASSWORD: Ikechukwusia1# -->
 
 <div id="loginView" class="min-h-screen flex items-center justify-center px-5">
   <div class="w-full max-w-sm">
@@ -37,21 +37,21 @@ tr:hover{background:rgba(255,255,255,.02)}
 
 <div id="appView" class="hidden">
   <header class="sticky top-0 z-10 bg-navy/90 backdrop-blur-xl border-b border-white/10">
-    <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
       <div class="flex items-center gap-2.5">
         <div class="w-8 h-8 rounded-lg bg-gold flex items-center justify-center text-navy font-black text-sm">W</div>
         <p class="font-extrabold text-sm">Admin Panel</p>
       </div>
       <button id="logoutBtn" class="text-[11px] font-bold px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-slate-300">Logout</button>
     </div>
-    <nav class="max-w-5xl mx-auto px-4 flex gap-1 pb-2">
+    <nav class="max-w-6xl mx-auto px-4 flex gap-1 pb-2">
       <button data-tab="claims" class="tabBtn text-[11px] font-bold px-3 py-1.5 rounded-lg bg-gold/15 text-gold border border-gold/30">Claims</button>
       <button data-tab="workers" class="tabBtn text-[11px] font-bold px-3 py-1.5 rounded-lg text-slate-400">Workers</button>
       <button data-tab="employers" class="tabBtn text-[11px] font-bold px-3 py-1.5 rounded-lg text-slate-400">Employers</button>
     </nav>
   </header>
 
-  <main class="max-w-5xl mx-auto px-4 py-5">
+  <main class="max-w-6xl mx-auto px-4 py-5">
 
     <section id="tab-claims">
       <div class="flex items-center justify-between mb-3">
@@ -87,7 +87,7 @@ tr:hover{background:rgba(255,255,255,.02)}
       </div>
       <div class="overflow-x-auto rounded-xl bg-white/5 border border-white/10">
         <table id="employersTable">
-          <thead><tr><th>Company</th><th>Email</th><th>Phone</th><th>Jobs</th><th>Credits</th><th>Telegram ID</th><th>Date</th></tr></thead>
+          <thead><tr><th>Company</th><th>License</th><th>Address</th><th>Email</th><th>Phone</th><th>Jobs</th><th>Credits</th><th>Telegram ID</th><th>Date</th></tr></thead>
           <tbody></tbody>
         </table>
       </div>
@@ -221,12 +221,12 @@ async function loadWorkers() {
 
 async function loadEmployers() {
   const tbody = document.querySelector('#employersTable tbody');
-  tbody.innerHTML = '<tr><td colspan="7" class="text-center text-slate-500 py-6">Loading…</td></tr>';
+  tbody.innerHTML = '<tr><td colspan="9" class="text-center text-slate-500 py-6">Loading…</td></tr>';
   try {
     const emps = await rpc('admin_list_employers', { admin_pass: sessionPassword });
-    if (!emps.length) { tbody.innerHTML = '<tr><td colspan="7" class="text-center text-slate-500 py-6">No employers yet.</td></tr>'; return; }
-    tbody.innerHTML = emps.map(e => '<tr><td class="font-bold">' + esc(e.company_name) + '</td><td>' + esc(e.email || '—') + '</td><td>' + esc(e.phone || '—') + '</td><td>' + (e.jobs && e.jobs.length ? esc(e.jobs.join(', ')) : '—') + '</td><td class="font-extrabold text-gold">' + (e.credits || 0) + '</td><td class="text-slate-500">' + esc(String(e.telegram_id || '—')) + '</td><td class="text-slate-500">' + new Date(e.created_at).toLocaleDateString() + '</td></tr>').join('');
-  } catch (err) { tbody.innerHTML = '<tr><td colspan="7" class="text-red-400 py-4">Error: ' + err.message + '</td></tr>'; }
+    if (!emps.length) { tbody.innerHTML = '<tr><td colspan="9" class="text-center text-slate-500 py-6">No employers yet.</td></tr>'; return; }
+    tbody.innerHTML = emps.map(e => '<tr><td class="font-bold">' + esc(e.company_name) + '</td><td class="text-gold">' + esc(e.license_number || '—') + '</td><td>' + esc(e.office_address || '—') + '</td><td>' + esc(e.email || '—') + '</td><td>' + esc(e.phone || '—') + '</td><td>' + (e.jobs && e.jobs.length ? esc(e.jobs.join(', ')) : '—') + '</td><td class="font-extrabold text-gold">' + (e.credits || 0) + '</td><td class="text-slate-500">' + esc(String(e.telegram_id || '—')) + '</td><td class="text-slate-500">' + new Date(e.created_at).toLocaleDateString() + '</td></tr>').join('');
+  } catch (err) { tbody.innerHTML = '<tr><td colspan="9" class="text-red-400 py-4">Error: ' + err.message + '</td></tr>'; }
 }
 
 function esc(s) { if (s == null) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
@@ -247,8 +247,8 @@ document.getElementById('exportWorkers').addEventListener('click', async () => {
 
 document.getElementById('exportEmployers').addEventListener('click', async () => {
   const emps = await rpc('admin_list_employers', { admin_pass: sessionPassword });
-  const rows = [['Company','Email','Phone','Jobs','Credits','Telegram','Date']];
-  emps.forEach(e => rows.push([e.company_name,e.email,e.phone,(e.jobs||[]).join('; '),e.credits,e.telegram_id,e.created_at]));
+  const rows = [['Company','License','Address','Email','Phone','Jobs','Credits','Telegram','Date']];
+  emps.forEach(e => rows.push([e.company_name,e.license_number,e.office_address,e.email,e.phone,(e.jobs||[]).join('; '),e.credits,e.telegram_id,e.created_at]));
   downloadCSV('worldbridge-employers.csv', rows);
 });
 
