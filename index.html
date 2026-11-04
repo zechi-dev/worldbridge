@@ -256,7 +256,13 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
         <p class="text-[11.5px] leading-relaxed text-slate-300"><span class="text-white font-bold">Recruitment access.</span> Browse verified worker leads. Unlock full contact details with USDT credits.</p>
       </div>
       <form id="employerForm" class="mt-5 space-y-4" autocomplete="on">
-        <div><label class="label" for="companyName">Company or Individual Name *</label><input class="input" id="companyName" name="companyName" type="text" placeholder="e.g. Al Futtaim Recruitment LLC" autocomplete="organization" required></div>
+        <div><label class="label" for="companyName">Company Name *</label><input class="input" id="companyName" name="companyName" type="text" placeholder="e.g. Al Futtaim Recruitment LLC" autocomplete="organization" required></div>
+        
+        <!-- NEW FIELDS ADDED HERE -->
+        <div><label class="label" for="licenseNumber">Business License Number *</label><input class="input" id="licenseNumber" name="licenseNumber" type="text" placeholder="e.g. DED-123456" required></div>
+        <div><label class="label" for="officeAddress">Office Address *</label><input class="input" id="officeAddress" name="officeAddress" type="text" placeholder="e.g. Business Bay, Dubai" required></div>
+        <!-- END NEW FIELDS -->
+
         <div><label class="label" for="employerEmail">Email *</label><input class="input" id="employerEmail" name="employerEmail" type="email" placeholder="office@company.com" autocomplete="email" required></div>
         <div>
           <label class="label" for="employerPhone">Phone Number *</label>
@@ -286,7 +292,7 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
         <button id="employerSubmitBtn" type="submit" class="w-full rounded-2xl bg-gold text-navy font-extrabold text-[15px] py-4 shadow-xl shadow-gold/25 active:scale-[0.98] transition flex items-center justify-center gap-2.5 disabled:opacity-70 disabled:active:scale-100">
           <span id="employerSpinner" class="spinner hidden"></span><span id="employerBtnText">Create Recruitment Account</span>
         </button>
-        <p class="text-center text-[10px] text-slate-500 pb-2">We use these details to send you payment receipts and lead invoices.</p>
+        <p class="text-center text-[10px] text-slate-500 pb-2">We use these details to verify your agency and send payment receipts.</p>
       </form>
     </div>
   </section>
@@ -587,11 +593,23 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
     if (!employerForm.checkValidity()) { employerForm.reportValidity(); return; }
     const fd = new FormData(employerForm);
     const companyName = val(fd,'companyName');
+    const licenseNumber = val(fd,'licenseNumber');
+    const officeAddress = val(fd,'officeAddress');
     const email = val(fd,'employerEmail');
     const phone = val(fd,'employerPhone');
     const jobs = fd.getAll('employerJobs').map(j => String(j).trim()).filter(Boolean);
     if (!jobs.length) { showBox(empError, empErrorText, 'Please select at least one role you recruit for.'); return; }
-    const payload = { company_name: companyName, email, phone, jobs, telegram_id: TG_USER_ID, role: 'employer', credits: 0 };
+    const payload = { 
+      company_name: companyName, 
+      license_number: licenseNumber,
+      office_address: officeAddress,
+      email, 
+      phone, 
+      jobs, 
+      telegram_id: TG_USER_ID, 
+      role: 'employer', 
+      credits: 0 
+    };
     setLoading(empSubmitBtn, empSpinner, empBtnText, true, 'Create Recruitment Account', 'Creating…');
     try {
       const res = await fetch(SUPABASE_URL + '/rest/v1/employer_registrations', {
