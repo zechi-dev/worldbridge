@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>WorldBridge Admin</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<script>
+tailwind.config = { theme: { extend: { colors: { navy:'#0F172A', gold:'#F59E0B' }, fontFamily: { sans:['Inter','sans-serif'] } } } };
+</script>
+<style>
+body{font-family:Inter,sans-serif}
+table{border-collapse:collapse;width:100%}
+th,td{padding:8px 10px;text-align:left;font-size:11.5px;white-space:nowrap}
+th{font-weight:700;color:#94A3B8;text-transform:uppercase;font-size:9px;letter-spacing:.05em;background:rgba(255,255,255,.03)}
+tr{border-bottom:1px solid rgba(255,255,255,.05)}
+tr:hover{background:rgba(255,255,255,.02)}
+</style>
+</head>
+<body class="bg-navy text-white min-h-screen">
+
+<!-- ADMIN PASSWORD: Ikechukwusia1# (also check SQL functions — must match) -->
+
+<div id="loginView" class="min-h-screen flex items-center justify-center px-5">
+  <div class="w-full max-w-sm">
+    <div class="text-center mb-8">
+      <div class="w-14 h-14 mx-auto rounded-2xl bg-gold flex items-center justify-center text-navy font-black text-2xl shadow-lg shadow-gold/20">W</div>
+      <h1 class="mt-4 text-[22px] font-extrabold">WorldBridge Admin</h1>
+      <p class="text-[12px] text-slate-400 mt-1">Restricted access</p>
+    </div>
+    <input id="passwordInput" type="password" placeholder="Admin password" class="w-full rounded-xl bg-white/5 border border-white/10 px-4 py-3 text-sm outline-none focus:border-gold">
+    <button id="loginBtn" class="mt-3 w-full rounded-xl bg-gold text-navy font-extrabold text-sm py-3">Enter</button>
+    <p id="loginError" class="mt-3 text-red-400 text-[11.5px] text-center hidden">Invalid password</p>
+  </div>
+</div>
+
+<div id="appView" class="hidden">
+  <header class="sticky top-0 z-10 bg-navy/90 backdrop-blur-xl border-b border-white/10">
+    <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-lg bg-gold flex items-center justify-center text-navy font-black text-sm">W</div>
+        <p class="font-extrabold text-sm">Admin Panel</p>
+      </div>
+      <button id="logoutBtn" class="text-[11px] font-bold px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-slate-300">Logout</button>
+    </div>
+    <nav class="max-w-5xl mx-auto px-4 flex gap-1 pb-2">
+      <button data-tab="claims" class="tabBtn text-[11px] font-bold px-3 py-1.5 rounded-lg bg-gold/15 text-gold border border-gold/30">Claims</button>
+      <button data-tab="workers" class="tabBtn text-[11px] font-bold px-3 py-1.5 rounded-lg text-slate-400">Workers</button>
+      <button data-tab="employers" class="tabBtn text-[11px] font-bold px-3 py-1.5 rounded-lg text-slate-400">Employers</button>
+    </nav>
+  </header>
+
+  <main class="max-w-5xl mx-auto px-4 py-5">
+
+    <section id="tab-claims">
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="text-sm font-extrabold">Payment Claims</h2>
+        <button id="refreshClaims" class="text-[10.5px] font-bold px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-slate-300">Refresh</button>
+      </div>
+      <div id="claimsList" class="space-y-2"></div>
+    </section>
+
+    <section id="tab-workers" class="hidden">
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="text-sm font-extrabold">Worker Leads</h2>
+        <div class="flex gap-2">
+          <button id="refreshWorkers" class="text-[10.5px] font-bold px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-slate-300">Refresh</button>
+          <button id="exportWorkers" class="text-[10.5px] font-bold px-3 py-1.5 rounded-lg bg-gold text-navy">Export CSV</button>
+        </div>
+      </div>
+      <div class="overflow-x-auto rounded-xl bg-white/5 border border-white/10">
+        <table id="workersTable">
+          <thead><tr><th>Name</th><th>Phone</th><th>Email</th><th>Job</th><th>Location</th><th>Qual</th><th>Exp</th><th>Passport</th><th>Ready</th><th>CV</th><th>Date</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="tab-employers" class="hidden">
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="text-sm font-extrabold">Employers</h2>
+        <div class="flex gap-2">
+          <button id="refreshEmployers" class="text-[10.5px] font-bold px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-slate-300">Refresh</button>
+          <button id="exportEmployers" class="text-[10.5px] font-bold px-3 py-1.5 rounded-lg bg-gold text-navy">Export CSV</button>
+        </div>
+      </div>
+      <div class="overflow-x-auto rounded-xl bg-white/5 border border-white/10">
+        <table id="employersTable">
+          <thead><tr><th>Company</th><th>Email</th><th>Phone</th><th>Jobs</th><th>Credits</th><th>Telegram ID</th><th>Date</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+const SUPABASE_URL = "PASTE_URL";
+const SUPABASE_KEY = "PASTE_KEY";
+
+let sessionPassword = '';
+const loginView = document.getElementById('loginView');
+const appView = document.getElementById('appView');
+const passwordInput = document.getElementById('passwordInput');
+const loginBtn = document.getElementById('loginBtn');
+const loginError = document.getElementById('loginError');
+
+loginBtn.addEventListener('click', tryLogin);
+passwordInput.addEventListener('keypress', e => { if (e.key === 'Enter') tryLogin(); });
+
+async function tryLogin() {
+  const p = passwordInput.value.trim();
+  if (!p) return;
+  try {
+    await rpc('admin_list_orders', { admin_pass: p });
+    sessionPassword = p;
+    sessionStorage.setItem('wb_admin_pass', p);
+    loginView.classList.add('hidden');
+    appView.classList.remove('hidden');
+    loginError.classList.add('hidden');
+    loadAll();
+  } catch (err) {
+    loginError.classList.remove('hidden');
+  }
+}
+
+const savedPass = sessionStorage.getItem('wb_admin_pass');
+if (savedPass) { passwordInput.value = savedPass; tryLogin(); }
+
+document.getElementById('logoutBtn').addEventListener('click', () => {
+  sessionStorage.removeItem('wb_admin_pass');
+  sessionPassword = '';
+  appView.classList.add('hidden');
+  loginView.classList.remove('hidden');
+  passwordInput.value = '';
+});
+
+async function rpc(fn, params) {
+  const res = await fetch(SUPABASE_URL + '/rest/v1/rpc/' + fn, {
+    method: 'POST',
+    headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY, 'Content-Type': 'application/json' },
+    body: JSON.stringify(params)
+  });
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
+}
+
+document.querySelectorAll('.tabBtn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const tab = btn.dataset.tab;
+    document.querySelectorAll('.tabBtn').forEach(b => {
+      b.className = 'tabBtn text-[11px] font-bold px-3 py-1.5 rounded-lg ' +
+        (b === btn ? 'bg-gold/15 text-gold border border-gold/30' : 'text-slate-400');
+    });
+    ['claims','workers','employers'].forEach(t => document.getElementById('tab-' + t).classList.toggle('hidden', t !== tab));
+  });
+});
+
+function loadAll() { loadClaims(); loadWorkers(); loadEmployers(); }
+
+async function loadClaims() {
+  const list = document.getElementById('claimsList');
+  list.innerHTML = '<p class="text-center text-slate-500 text-[11.5px] py-8">Loading…</p>';
+  try {
+    const orders = await rpc('admin_list_orders', { admin_pass: sessionPassword });
+    const pending = orders.filter(o => o.status === 'claimed');
+    const confirmed = orders.filter(o => o.status === 'confirmed').slice(0, 10);
+    if (!orders.length) { list.innerHTML = '<div class="rounded-xl bg-white/5 border border-white/10 p-6 text-center"><p class="text-[12px] text-slate-400">No orders yet.</p></div>'; return; }
+    let html = '';
+    if (pending.length) {
+      html += '<p class="text-[10px] font-bold uppercase tracking-wider text-gold mb-2 mt-1">Awaiting Verification (' + pending.length + ')</p>';
+      pending.forEach(o => { html += renderClaim(o, true); });
+    }
+    if (confirmed.length) {
+      html += '<p class="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-2 mt-4">Recent Confirmed</p>';
+      confirmed.forEach(o => { html += renderClaim(o, false); });
+    }
+    if (!pending.length && !confirmed.length) html = '<div class="rounded-xl bg-white/5 border border-white/10 p-6 text-center"><p class="text-[12px] text-slate-400">No claims to review.</p></div>';
+    list.innerHTML = html;
+    list.querySelectorAll('[data-confirm]').forEach(b => b.addEventListener('click', () => confirmOrder(b.dataset.confirm)));
+    list.querySelectorAll('[data-reject]').forEach(b => b.addEventListener('click', () => rejectOrder(b.dataset.reject)));
+  } catch (err) {
+    list.innerHTML = '<p class="text-red-400 text-[11.5px] py-4">Error: ' + err.message + '</p>';
+  }
+}
+
+function renderClaim(o, actionable) {
+  const date = new Date(o.created_at).toLocaleString();
+  const badge = actionable
+    ? '<div class="mt-2 flex gap-2"><button data-confirm="' + o.id + '" class="flex-1 rounded-lg bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-[11px] font-extrabold py-2">✓ Confirm</button><button data-reject="' + o.id + '" class="flex-1 rounded-lg bg-red-500/15 border border-red-500/30 text-red-300 text-[11px] font-extrabold py-2">✗ Reject</button></div>'
+    : '<p class="mt-2 text-[10px] text-emerald-400 font-bold">✓ Confirmed ' + (o.confirmed_at ? new Date(o.confirmed_at).toLocaleString() : '') + '</p>';
+  return '<div class="rounded-xl bg-white/5 border border-white/10 p-3"><div class="flex items-start justify-between gap-3"><div class="min-w-0 flex-1"><p class="text-[13px] font-extrabold">' + esc(o.company_name) + '</p><p class="text-[10.5px] text-slate-400 mt-0.5">' + esc(o.reference) + ' · ' + date + '</p></div><div class="text-right shrink-0"><p class="text-[14px] font-extrabold text-gold">' + o.amount_usdt + ' USDT</p><p class="text-[10px] text-slate-500">' + o.credits + ' credits</p></div></div>' + badge + '</div>';
+}
+
+async function confirmOrder(id) {
+  if (!confirm('Confirm this payment? Credits will be added.')) return;
+  try {
+    const r = await rpc('admin_confirm_payment', { order_id: id, admin_pass: sessionPassword });
+    if (r.success) loadClaims();
+    else alert('Error: ' + r.error);
+  } catch (err) { alert('Failed: ' + err.message); }
+}
+
+async function rejectOrder(id) {
+  if (!confirm('Reject this claim?')) return;
+  try { await rpc('admin_reject_payment', { order_id: id, admin_pass: sessionPassword }); loadClaims(); }
+  catch (err) { alert('Failed: ' + err.message); }
+}
+
+async function loadWorkers() {
+  const tbody = document.querySelector('#workersTable tbody');
+  tbody.innerHTML = '<tr><td colspan="11" class="text-center text-slate-500 py-6">Loading…</td></tr>';
+  try {
+    const leads = await rpc('admin_list_leads', { admin_pass: sessionPassword });
+    if (!leads.length) { tbody.innerHTML = '<tr><td colspan="11" class="text-center text-slate-500 py-6">No workers yet.</td></tr>'; return; }
+    tbody.innerHTML = leads.map(l => '<tr><td class="font-bold">' + esc(l.name) + '</td><td>' + esc(l.phone) + '</td><td>' + esc(l.email || '—') + '</td><td>' + esc(l.job) + '</td><td>' + esc(l.location) + '</td><td>' + esc(l.qualification) + '</td><td>' + esc(l.experience) + '</td><td>' + (l.passport ? '✓ ' + esc(l.passport_last4 || '') : '✗') + '</td><td>' + esc(l.ready) + '</td><td>' + (l.cv ? '<a href="' + esc(l.cv) + '" target="_blank" class="text-gold underline">Link</a>' : '—') + '</td><td class="text-slate-500">' + new Date(l.created_at).toLocaleDateString() + '</td></tr>').join('');
+  } catch (err) { tbody.innerHTML = '<tr><td colspan="11" class="text-red-400 py-4">Error: ' + err.message + '</td></tr>'; }
+}
+
+async function loadEmployers() {
+  const tbody = document.querySelector('#employersTable tbody');
+  tbody.innerHTML = '<tr><td colspan="7" class="text-center text-slate-500 py-6">Loading…</td></tr>';
+  try {
+    const emps = await rpc('admin_list_employers', { admin_pass: sessionPassword });
+    if (!emps.length) { tbody.innerHTML = '<tr><td colspan="7" class="text-center text-slate-500 py-6">No employers yet.</td></tr>'; return; }
+    tbody.innerHTML = emps.map(e => '<tr><td class="font-bold">' + esc(e.company_name) + '</td><td>' + esc(e.email || '—') + '</td><td>' + esc(e.phone || '—') + '</td><td>' + (e.jobs && e.jobs.length ? esc(e.jobs.join(', ')) : '—') + '</td><td class="font-extrabold text-gold">' + (e.credits || 0) + '</td><td class="text-slate-500">' + esc(String(e.telegram_id || '—')) + '</td><td class="text-slate-500">' + new Date(e.created_at).toLocaleDateString() + '</td></tr>').join('');
+  } catch (err) { tbody.innerHTML = '<tr><td colspan="7" class="text-red-400 py-4">Error: ' + err.message + '</td></tr>'; }
+}
+
+function esc(s) { if (s == null) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function downloadCSV(filename, rows) {
+  const csv = rows.map(r => r.map(c => { const s = String(c == null ? '' : c); return (s.includes(',')||s.includes('"')||s.includes('\n')) ? '"' + s.replace(/"/g,'""') + '"' : s; }).join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = filename; a.click(); URL.revokeObjectURL(url);
+}
+
+document.getElementById('exportWorkers').addEventListener('click', async () => {
+  const leads = await rpc('admin_list_leads', { admin_pass: sessionPassword });
+  const rows = [['Name','Phone','Email','Location','Job','Qualification','Experience','Passport','Passport4','Ready','CV','Telegram','Date']];
+  leads.forEach(l => rows.push([l.name,l.phone,l.email,l.location,l.job,l.qualification,l.experience,l.passport?'Yes':'No',l.passport_last4,l.ready,l.cv,l.telegram_id,l.created_at]));
+  downloadCSV('worldbridge-workers.csv', rows);
+});
+
+document.getElementById('exportEmployers').addEventListener('click', async () => {
+  const emps = await rpc('admin_list_employers', { admin_pass: sessionPassword });
+  const rows = [['Company','Email','Phone','Jobs','Credits','Telegram','Date']];
+  emps.forEach(e => rows.push([e.company_name,e.email,e.phone,(e.jobs||[]).join('; '),e.credits,e.telegram_id,e.created_at]));
+  downloadCSV('worldbridge-employers.csv', rows);
+});
+
+document.getElementById('refreshClaims').addEventListener('click', loadClaims);
+document.getElementById('refreshWorkers').addEventListener('click', loadWorkers);
+document.getElementById('refreshEmployers').addEventListener('click', loadEmployers);
+</script>
+</body>
+</html>
