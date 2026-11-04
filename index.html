@@ -257,12 +257,8 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
       </div>
       <form id="employerForm" class="mt-5 space-y-4" autocomplete="on">
         <div><label class="label" for="companyName">Company Name *</label><input class="input" id="companyName" name="companyName" type="text" placeholder="e.g. Al Futtaim Recruitment LLC" autocomplete="organization" required></div>
-        
-        <!-- NEW FIELDS ADDED HERE -->
         <div><label class="label" for="licenseNumber">Business License Number *</label><input class="input" id="licenseNumber" name="licenseNumber" type="text" placeholder="e.g. DED-123456" required></div>
         <div><label class="label" for="officeAddress">Office Address *</label><input class="input" id="officeAddress" name="officeAddress" type="text" placeholder="e.g. Business Bay, Dubai" required></div>
-        <!-- END NEW FIELDS -->
-
         <div><label class="label" for="employerEmail">Email *</label><input class="input" id="employerEmail" name="employerEmail" type="email" placeholder="office@company.com" autocomplete="email" required></div>
         <div>
           <label class="label" for="employerPhone">Phone Number *</label>
@@ -393,11 +389,11 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
 </div>
 
 <script>
-  /* ============ CONFIG — FILL THESE IN LATER ============ */
-  const SUPABASE_URL = "PASTE_URL";
-  const SUPABASE_KEY = "PASTE_KEY";
+  /* ============ CONFIG ============ */
+  const SUPABASE_URL = "https://fnpccciwbwrragpnzyqc.supabase.co";
+  const SUPABASE_KEY = "sb_publishable_i1BSTJbZ1nWkMzxJ0NZj-g_mMRA6wvZ";
   const ACCOUNTS_HANDLE = "WorldBridgeDesk";
-  const USDT_ADDRESS = "PASTE_TRC20_ADDRESS";
+  const USDT_ADDRESS = "TNdv8vkaNdWYHPrHYuwuzjW6ivhHynr4vZ";
 
   const PACKAGES = [
     { id: 'p5',  credits: 5,  price: 80,  label: 'Starter',  desc: '5 worker contacts' },
