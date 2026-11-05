@@ -4,60 +4,119 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#0F172A">
-<title>WorldBridge</title>
+<title>WorldBridge — Dubai &amp; Gulf Jobs</title>
+
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
 <script>
-tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B',gold:'#F59E0B'}, fontFamily:{sans:['Inter','sans-serif']} } } };
+tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B',gold:'#F59E0B'}, fontFamily:{sans:['Inter','ui-sans-serif','system-ui','sans-serif']} } } };
 </script>
+
 <style type="text/tailwindcss">
   @layer components {
     .label { @apply block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5; }
-    .input { @apply w-full rounded-xl bg-white/5 border border-white/10 px-4 py-3 text-sm text-white placeholder-slate-500 outline-none transition focus:border-gold; }
+    .input { @apply w-full rounded-xl bg-white/5 border border-white/10 px-4 py-3 text-sm text-white placeholder-slate-500 outline-none transition focus:border-gold focus:bg-white/[0.07] focus:ring-2 focus:ring-gold/20; }
+    .select { @apply w-full rounded-xl bg-white/5 border border-white/10 px-4 py-3 text-sm text-white outline-none transition appearance-none pr-10 focus:border-gold focus:bg-white/[0.07] focus:ring-2 focus:ring-gold/20; background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394A3B8' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='m19 9-7 7-7-7'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 0.85rem center; background-size: 1rem; }
     .card { @apply rounded-2xl bg-white/5 border border-white/10; }
     .btn { @apply w-full rounded-2xl bg-gold text-navy font-extrabold text-[15px] py-4 active:scale-[0.98] transition; }
   }
 </style>
+
 <style>
-  body { -webkit-tap-highlight-color: transparent; overscroll-behavior-y: none; }
+  html, body { -webkit-tap-highlight-color: transparent; }
+  body { overscroll-behavior-y: none; }
   select option { color: #0F172A; background: #FFFFFF; }
   .spinner { width:18px; height:18px; border:2.5px solid rgba(15,23,42,.25); border-top-color:#0F172A; border-radius:50%; animation: spin .7s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
   .fade-in { animation: fadeIn .35s ease both; }
   @keyframes fadeIn { from { opacity:0; transform: translateY(8px);} to { opacity:1; transform:translateY(0);} }
+  .safe-bottom { padding-bottom: calc(1.5rem + env(safe-area-inset-bottom)); }
 </style>
 </head>
+
 <body class="bg-navy text-white font-sans antialiased selection:bg-gold selection:text-navy">
+<div class="min-h-screen w-full">
 
-<div id="app" class="min-h-screen w-full">
-
-  <!-- VIEW: ROLE SELECT -->
+  <!-- VIEW 0 — MAIN HOME / ROLE SELECT -->
   <section id="view-role" class="view">
-    <div class="max-w-md mx-auto px-5 min-h-screen flex flex-col justify-center py-12 fade-in">
-      <div class="flex items-center gap-2.5 mb-8">
-        <div class="w-11 h-11 rounded-xl bg-gold flex items-center justify-center text-navy font-black text-xl shadow-lg shadow-gold/20">W</div>
-        <div class="leading-tight"><p class="font-extrabold tracking-tight text-lg">WorldBridge</p><p class="text-[9.5px] text-gold font-bold tracking-[0.18em] uppercase">Dubai · UAE · Gulf</p></div>
+    <header class="sticky top-0 z-30 bg-navy/85 backdrop-blur-xl border-b border-white/10">
+      <div class="max-w-md mx-auto px-5 py-3 flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-gold flex items-center justify-center text-navy font-black text-lg shadow-lg shadow-gold/20">W</div>
+          <div class="leading-tight">
+            <p class="font-extrabold tracking-tight text-[15px]">WorldBridge</p>
+            <p class="text-[9px] text-gold font-bold tracking-[0.18em] uppercase">Dubai · UAE · Gulf</p>
+          </div>
+        </div>
+        <span class="text-[10px] font-extrabold px-2.5 py-1 rounded-full bg-gold/15 text-gold border border-gold/30">FREE</span>
       </div>
-      <h1 class="text-[28px] leading-tight font-extrabold tracking-tight">How will you use<br><span class="text-gold">WorldBridge?</span></h1>
-      <div class="mt-7 space-y-3">
-        <button onclick="selectRole('worker')" class="w-full text-left card p-4 flex items-center gap-4 active:scale-[0.98] hover:border-gold/40">
-          <div class="w-12 h-12 rounded-xl bg-gold/15 border border-gold/25 flex items-center justify-center shrink-0 text-gold text-xl font-black">👷</div>
-          <div class="flex-1"><p class="font-extrabold text-[15px]">I'm a Worker</p><p class="text-[11.5px] text-slate-400">Apply for jobs for free.</p></div>
-        </button>
-        <button onclick="selectRole('recruiter')" class="w-full text-left card p-4 flex items-center gap-4 active:scale-[0.98] hover:border-gold/40">
-          <div class="w-12 h-12 rounded-xl bg-gold/15 border border-gold/25 flex items-center justify-center shrink-0 text-gold text-xl font-black">🏢</div>
-          <div class="flex-1"><p class="font-extrabold text-[15px]">I'm a Recruiter</p><p class="text-[11.5px] text-slate-400">Hire verified workers.</p></div>
-        </button>
-        <button onclick="selectRole('agent')" class="w-full text-left card p-4 flex items-center gap-4 active:scale-[0.98] hover:border-gold/40">
-          <div class="w-12 h-12 rounded-xl bg-gold/15 border border-gold/25 flex items-center justify-center shrink-0 text-gold text-xl font-black">🤝</div>
-          <div class="flex-1"><p class="font-extrabold text-[15px]">I'm an Agent</p><p class="text-[11.5px] text-slate-400">Upload candidates. Earn $1/unlock.</p></div>
-        </button>
-        <button onclick="selectRole('sourcer')" class="w-full text-left card p-4 flex items-center gap-4 active:scale-[0.98] hover:border-gold/40">
-          <div class="w-12 h-12 rounded-xl bg-gold/15 border border-gold/25 flex items-center justify-center shrink-0 text-gold text-xl font-black">🔗</div>
-          <div class="flex-1"><p class="font-extrabold text-[15px]">I'm a Sourcer</p><p class="text-[11.5px] text-slate-400">Refer friends. Earn $3/unlock.</p></div>
-        </button>
+    </header>
+
+    <div class="max-w-md mx-auto px-5">
+      <div class="pt-8">
+        <div class="inline-flex items-center gap-2 rounded-full bg-white/5 border border-white/10 px-3 py-1.5">
+          <span class="w-1.5 h-1.5 rounded-full bg-gold animate-pulse"></span>
+          <span class="text-[11px] font-extrabold tracking-widest uppercase text-gold">Employer Pays</span>
+        </div>
+        <h1 class="mt-4 text-[34px] leading-[1.1] font-extrabold tracking-tight">Your Gateway to<br><span class="text-gold">Dubai &amp; Gulf</span> Jobs</h1>
+        <p class="mt-3.5 text-[13.5px] leading-relaxed text-slate-300">Verified Gulf employers. <span class="text-white font-semibold">Zero placement fees.</span> Free visa, accommodation and flight ticket — the employer pays, not you.</p>
+        
+        <div class="mt-7 space-y-3">
+          <button onclick="selectRole('worker')" class="w-full text-left card p-4 flex items-center gap-4 active:scale-[0.98] transition hover:border-gold/40">
+            <div class="w-12 h-12 rounded-xl bg-gold/15 border border-gold/25 flex items-center justify-center shrink-0 text-gold text-xl font-black">👷</div>
+            <div class="flex-1"><p class="font-extrabold text-[15px]">I'm a Worker</p><p class="text-[11.5px] text-slate-400">Apply for jobs in Dubai &amp; the Gulf. Free.</p></div>
+            <svg class="w-5 h-5 text-slate-500 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
+          </button>
+          <button onclick="selectRole('recruiter')" class="w-full text-left card p-4 flex items-center gap-4 active:scale-[0.98] transition hover:border-gold/40">
+            <div class="w-12 h-12 rounded-xl bg-gold/15 border border-gold/25 flex items-center justify-center shrink-0 text-gold text-xl font-black">🏢</div>
+            <div class="flex-1"><p class="font-extrabold text-[15px]">I'm a Recruitment Office</p><p class="text-[11.5px] text-slate-400">Browse verified worker leads. Pay per unlock.</p></div>
+            <svg class="w-5 h-5 text-slate-500 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
+          </button>
+          <button onclick="selectRole('agent')" class="w-full text-left card p-4 flex items-center gap-4 active:scale-[0.98] transition hover:border-gold/40">
+            <div class="w-12 h-12 rounded-xl bg-gold/15 border border-gold/25 flex items-center justify-center shrink-0 text-gold text-xl font-black">🤝</div>
+            <div class="flex-1"><p class="font-extrabold text-[15px]">I'm an Agent</p><p class="text-[11.5px] text-slate-400">Upload candidates. Earn $1 per unlock.</p></div>
+            <svg class="w-5 h-5 text-slate-500 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
+          </button>
+          <button onclick="selectRole('sourcer')" class="w-full text-left card p-4 flex items-center gap-4 active:scale-[0.98] transition hover:border-gold/40">
+            <div class="w-12 h-12 rounded-xl bg-gold/15 border border-gold/25 flex items-center justify-center shrink-0 text-gold text-xl font-black">🔗</div>
+            <div class="flex-1"><p class="font-extrabold text-[15px]">I'm a Sourcer</p><p class="text-[11.5px] text-slate-400">Refer friends. Earn $3 per unlock.</p></div>
+            <svg class="w-5 h-5 text-slate-500 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
+          </button>
+        </div>
+
+        <div class="mt-3 flex items-center justify-center gap-3 text-[10.5px] text-slate-400 font-medium"><span>✓ No fees</span><span class="w-1 h-1 rounded-full bg-slate-600"></span><span>✓ Free visa</span><span class="w-1 h-1 rounded-full bg-slate-600"></span><span>✓ 2 min form</span></div>
       </div>
+
+      <div class="mt-9">
+        <div class="flex items-end justify-between mb-3">
+          <h2 class="text-sm font-extrabold tracking-tight">Open Roles</h2>
+          <span class="text-[10.5px] font-semibold text-gold">Visa · Accommodation · Ticket</span>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div class="card overflow-hidden"><img src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=500&q=70" alt="Caregiver" loading="lazy" class="h-24 w-full object-cover"><div class="p-3"><p class="text-[13px] font-extrabold leading-tight">Caregiver</p><p class="text-[10.5px] text-slate-400 mt-0.5">Homes &amp; Clinics</p></div></div>
+          <div class="card overflow-hidden"><img src="https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?auto=format&fit=crop&w=500&q=70" alt="Driver" loading="lazy" class="h-24 w-full object-cover"><div class="p-3"><p class="text-[13px] font-extrabold leading-tight">Driver</p><p class="text-[10.5px] text-slate-400 mt-0.5">Light &amp; Heavy</p></div></div>
+          <div class="card overflow-hidden"><img src="https://images.unsplash.com/photo-1590650153855-d9e808231d41?auto=format&fit=crop&w=500&q=70" alt="Security" loading="lazy" class="h-24 w-full object-cover"><div class="p-3"><p class="text-[13px] font-extrabold leading-tight">Security</p><p class="text-[10.5px] text-slate-400 mt-0.5">Guard &amp; CCTV</p></div></div>
+          <div class="card overflow-hidden"><img src="https://images.unsplash.com/photo-1553413077-190dd305871c?auto=format&fit=crop&w=500&q=70" alt="Warehouse" loading="lazy" class="h-24 w-full object-cover"><div class="p-3"><p class="text-[13px] font-extrabold leading-tight">Warehouse</p><p class="text-[10.5px] text-slate-400 mt-0.5">Factory &amp; Logistics</p></div></div>
+        </div>
+      </div>
+
+      <div class="mt-9">
+        <h2 class="text-sm font-extrabold tracking-tight mb-3">How It Works</h2>
+        <div class="grid grid-cols-3 gap-3">
+          <div class="card p-3 text-center"><div class="mx-auto w-8 h-8 rounded-full bg-gold text-navy font-black text-[13px] flex items-center justify-center">1</div><p class="mt-2 text-[12px] font-extrabold">Apply</p><p class="text-[10px] text-slate-400 mt-0.5">2 minutes</p></div>
+          <div class="card p-3 text-center"><div class="mx-auto w-8 h-8 rounded-full bg-gold text-navy font-black text-[13px] flex items-center justify-center">2</div><p class="mt-2 text-[12px] font-extrabold">Verify</p><p class="text-[10px] text-slate-400 mt-0.5">Docs &amp; call</p></div>
+          <div class="card p-3 text-center"><div class="mx-auto w-8 h-8 rounded-full bg-gold text-navy font-black text-[13px] flex items-center justify-center">3</div><p class="mt-2 text-[12px] font-extrabold">Fly</p><p class="text-[10px] text-slate-400 mt-0.5">Visa &amp; ticket</p></div>
+        </div>
+      </div>
+
+      <div class="mt-9 mb-4">
+        <p class="text-center text-[10px] text-slate-500 mt-2 leading-relaxed">WorldBridge Manpower Consultancy · Dubai, UAE<br>We never ask candidates for money.</p>
+      </div>
+      <div class="h-6"></div>
     </div>
   </section>
 
@@ -70,18 +129,9 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
         <input class="input" name="name" placeholder="Full Name" required>
         <input class="input" name="phone" type="tel" placeholder="WhatsApp Number" required>
         <input class="input" name="email" type="email" placeholder="Email (Optional)">
-        <select class="input text-white bg-navy" name="job" required>
-          <option value="">Select Job...</option>
-          <option>Caregiver</option><option>Driver</option><option>Security</option><option>Factory</option><option>Warehouse</option>
-        </select>
-        <select class="input text-white bg-navy" name="qualification" required>
-          <option value="">Qualification...</option>
-          <option>SSCE</option><option>OND</option><option>HND/BSc</option><option>Trade Cert</option>
-        </select>
-        <select class="input text-white bg-navy" name="experience" required>
-          <option value="">Experience...</option>
-          <option>None</option><option>1-2 Years</option><option>3-5 Years</option>
-        </select>
+        <select class="input text-white bg-navy" name="job" required><option value="">Select Job...</option><option>Caregiver</option><option>Driver</option><option>Security</option><option>Factory</option><option>Warehouse</option></select>
+        <select class="input text-white bg-navy" name="qualification" required><option value="">Qualification...</option><option>SSCE</option><option>OND</option><option>HND/BSc</option><option>Trade Cert</option></select>
+        <select class="input text-white bg-navy" name="experience" required><option value="">Experience...</option><option>None</option><option>1-2 Years</option><option>3-5 Years</option></select>
         <input class="input" name="cv" placeholder="CV Link (Google Drive)">
         <button type="submit" class="btn">Submit Application</button>
       </form>
@@ -103,9 +153,7 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
         <p id="cvStatus" class="text-[10px] text-slate-500 mt-2">No CV uploaded yet.</p>
       </div>
       <h2 class="font-bold text-sm mb-2">Notifications</h2>
-      <div id="workerNotifications" class="space-y-2">
-        <p class="text-xs text-slate-500">No new notifications.</p>
-      </div>
+      <div id="workerNotifications" class="space-y-2"><p class="text-xs text-slate-500">No new notifications.</p></div>
     </div>
   </section>
 
@@ -170,11 +218,7 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
         <input class="input" name="email" type="email" placeholder="Email">
         <input class="input" name="phone" type="tel" placeholder="WhatsApp Number" required>
         <input class="input" name="address" placeholder="Address">
-        <select class="input text-white bg-navy" name="candidate_pool">
-          <option value="0-10">0 - 10 Candidates</option>
-          <option value="10-20">10 - 20 Candidates</option>
-          <option value="20+">20+ Candidates</option>
-        </select>
+        <select class="input text-white bg-navy" name="candidate_pool"><option value="0-10">0 - 10 Candidates</option><option value="10-20">10 - 20 Candidates</option><option value="20+">20+ Candidates</option></select>
         <button type="submit" class="btn">Register as Agent</button>
       </form>
     </div>
@@ -235,12 +279,7 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
         <input class="input" name="email" type="email" placeholder="Email">
         <input class="input" name="phone" type="tel" placeholder="WhatsApp Number" required>
         <input class="input" name="address" placeholder="Address">
-        <select class="input text-white bg-navy" name="traffic_source">
-          <option value="Facebook">Facebook</option>
-          <option value="WhatsApp">WhatsApp</option>
-          <option value="Telegram">Telegram</option>
-          <option value="Other">Other</option>
-        </select>
+        <select class="input text-white bg-navy" name="traffic_source"><option value="Facebook">Facebook</option><option value="WhatsApp">WhatsApp</option><option value="Telegram">Telegram</option><option value="Other">Other</option></select>
         <button type="submit" class="btn">Get Referral Link</button>
       </form>
     </div>
