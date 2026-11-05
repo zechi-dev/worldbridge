@@ -164,7 +164,10 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
 
   <section id="view-recruiter-dash" class="view hidden bg-navy">
     <header class="sticky top-0 z-30 bg-navy/95 backdrop-blur-md border-b border-white/10 p-4 flex justify-between items-center">
-      <div><h1 class="font-extrabold text-[16px]">Recruiter Panel</h1><p class="text-[10px] text-gold font-bold tracking-wider uppercase">Talent Pool</p></div>
+      <div>
+        <h1 class="font-extrabold text-[16px]">Welcome, <span id="recruiterNameDisplay" class="text-gold">Recruiter</span></h1>
+        <p class="text-[10px] text-slate-400 font-bold tracking-wider uppercase">Talent Pool</p>
+      </div>
       <button onclick="showView('view-role')" class="text-xs font-bold bg-white/10 px-3 py-1.5 rounded-lg">Switch Role</button>
     </header>
     <div class="max-w-md mx-auto px-4 py-5 pb-24">
@@ -230,9 +233,7 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
         <h2 class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">My Candidates</h2>
         <span class="text-[10px] text-slate-500 font-bold" id="agentCount">0 Total</span>
       </div>
-      <div id="agentLeadsList" class="space-y-3">
-        <!-- Filled by JS -->
-      </div>
+      <div id="agentLeadsList" class="space-y-3"></div>
     </div>
   </section>
 
@@ -299,7 +300,7 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
     <div class="max-w-md mx-auto px-4 py-5">
       <div class="card p-5 text-center mb-5 border-gold/30 bg-gradient-to-b from-gold/10 to-transparent">
         <p class="text-[10px] text-slate-400 uppercase font-bold tracking-widest mb-2">Your Unique Referral Link</p>
-        <p class="text-[12px] font-mono text-gold break-all bg-navy/50 p-3 rounded-lg border border-gold/20 mb-3" id="refLink">...</p>
+        <p class="text-[12px] font-mono text-gold break-all bg-navy/50 p-3 rounded-lg border border-gold/20 mb-3" id="refLink">Loading...</p>
         <button onclick="copyRefLink()" class="bg-gold text-navy font-extrabold px-6 py-2 rounded-xl text-xs active:scale-95 transition">Copy Link</button>
       </div>
       <div class="flex gap-2 mb-5">
@@ -309,9 +310,7 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
         <h2 class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">My Referrals</h2>
         <span class="text-[10px] text-slate-500 font-bold" id="sourcerCount">0 Total</span>
       </div>
-      <div id="sourcerLeadsList" class="space-y-3">
-        <!-- Filled by JS -->
-      </div>
+      <div id="sourcerLeadsList" class="space-y-3"></div>
     </div>
   </section>
 
@@ -356,7 +355,7 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
   }
   function loading(show) { document.getElementById('loadingOverlay').classList.toggle('hidden', !show); }
 
-  // --- AUTO-LOGIN CHECK ON STARTUP ---
+  // --- AUTO-LOGIN CHECK ---
   async function checkAutoLogin() {
     if (!TG_ID) { showView('view-role'); return; }
     loading(true);
@@ -365,9 +364,15 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
       let data = await res.json();
       if (data.length > 0) { loading(false); loadWorkerDash(); return; }
 
-      res = await fetch(`${SUPABASE_URL}/rest/v1/recruiters?telegram_id=eq.${TG_ID}&select=telegram_id`, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } });
+      res = await fetch(`${SUPABASE_URL}/rest/v1/recruiters?telegram_id=eq.${TG_ID}&select=*`, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } });
       data = await res.json();
-      if (data.length > 0) { loading(false); showView('view-recruiter-dash'); loadRecruiterLeads(); return; }
+      if (data.length > 0) { 
+        loading(false); 
+        document.getElementById('recruiterNameDisplay').textContent = data[0].company_name;
+        showView('view-recruiter-dash'); 
+        loadRecruiterLeads(); 
+        return; 
+      }
 
       res = await fetch(`${SUPABASE_URL}/rest/v1/agents?telegram_id=eq.${TG_ID}&select=telegram_id`, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } });
       data = await res.json();
@@ -424,7 +429,9 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
     const data = Object.fromEntries(new FormData(e.target).entries());
     data.telegram_id = TG_ID;
     await fetch(`${SUPABASE_URL}/rest/v1/recruiters`, { method: 'POST', headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
-    loading(false); showView('view-recruiter-dash'); loadRecruiterLeads();
+    loading(false); 
+    document.getElementById('recruiterNameDisplay').textContent = data.company_name;
+    showView('view-recruiter-dash'); loadRecruiterLeads();
   });
 
   async function loadRecruiterLeads() {
@@ -546,7 +553,6 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
     e.preventDefault(); loading(true);
     const data = Object.fromEntries(new FormData(e.target).entries());
     data.telegram_id = TG_ID;
-    // Database generates referral_code automatically now
     await fetch(`${SUPABASE_URL}/rest/v1/sourcers`, { method: 'POST', headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
     loading(false); showView('view-sourcer-dash'); loadSourcerDash();
   });
