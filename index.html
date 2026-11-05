@@ -344,6 +344,26 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
 
   if(tg) { tg.ready(); tg.expand(); }
 
+  function escapeHTML(str) {
+    if (!str) return '';
+    return String(str).replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag]));
+  }
+
+  async function rpc(name, body) {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${name}`, {
+      method: 'POST',
+      headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    const out = await res.json().catch(() => null);
+    if (!res.ok) { 
+      console.error(name, out); 
+      alert(`${name} failed: ${out?.message || res.status}`); 
+      throw new Error(name); 
+    }
+    return Array.isArray(out) ? out : (out ? [out] : []);
+  }
+
   function showView(id) {
     document.querySelectorAll('.view').forEach(el => el.classList.add('hidden'));
     document.getElementById(id).classList.remove('hidden');
@@ -393,7 +413,7 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
   document.getElementById('workerForm').addEventListener('submit', async (e) => {
     e.preventDefault(); loading(true);
     const data = Object.fromEntries(new FormData(e.target).entries());
-    data.added_by_role = 'worker'; data.telegram_id = TG_ID;
+    data.added_by_role = 'worker'; data.telegram_id = TG_ID; data.location = 'Nigeria'; // Fallback location
     const startParam = tg?.initDataUnsafe?.start_param;
     if (startParam && startParam.startsWith('ref_')) data.referred_by_sourcer_tg_id = startParam.replace('ref_', '');
     await fetch(`${SUPABASE_URL}/rest/v1/gulf_leads`, { method: 'POST', headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
@@ -532,6 +552,7 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
   document.getElementById('agentAddForm').addEventListener('submit', async (e) => {
     e.preventDefault(); loading(true);
     const data = Object.fromEntries(new FormData(e.target).entries());
+    data.location = 'Nigeria'; // Fallback location
     
     // SAVE VIA SECURE RPC
     await rpc('agent_add_candidate', { 
@@ -560,17 +581,22 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
     e.preventDefault(); loading(true);
     const data = Object.fromEntries(new FormData(e.target).entries());
     
-    // SAVE VIA SECURE RPC
-    await rpc('create_sourcer_profile', { 
-      p_name: data.name, 
-      p_email: data.email, 
-      p_phone: data.phone, 
-      p_address: data.address, 
-      p_traffic_source: data.traffic_source, 
-      p_tg_id: TG_ID 
-    });
-    
-    loading(false); showView('view-sourcer-dash'); loadSourcerDash();
+    try {
+      // SAVE VIA SECURE RPC (Waits for database to confirm the code was generated)
+      await rpc('create_sourcer_profile', { 
+        p_name: data.name, 
+        p_email: data.email, 
+        p_phone: data.phone, 
+        p_address: data.address, 
+        p_traffic_source: data.traffic_source, 
+        p_tg_id: TG_ID 
+      });
+      
+      loading(false); showView('view-sourcer-dash'); loadSourcerDash();
+    } catch(err) {
+      loading(false);
+      alert("Database error. Please ensure SQL policies are set.");
+    }
   });
 
   async function loadSourcerDash() {
