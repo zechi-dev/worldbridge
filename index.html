@@ -57,6 +57,7 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
     </header>
 
     <div class="max-w-md mx-auto px-5">
+      <!-- HERO SECTION -->
       <div class="pt-8">
         <div class="inline-flex items-center gap-2 rounded-full bg-white/5 border border-white/10 px-3 py-1.5">
           <span class="w-1.5 h-1.5 rounded-full bg-gold animate-pulse"></span>
@@ -65,32 +66,10 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
         <h1 class="mt-4 text-[34px] leading-[1.1] font-extrabold tracking-tight">Your Gateway to<br><span class="text-gold">Dubai &amp; Gulf</span> Jobs</h1>
         <p class="mt-3.5 text-[13.5px] leading-relaxed text-slate-300">Verified Gulf employers. <span class="text-white font-semibold">Zero placement fees.</span> Free visa, accommodation and flight ticket — the employer pays, not you.</p>
         
-        <div class="mt-7 space-y-3">
-          <button onclick="selectRole('worker')" class="w-full text-left card p-4 flex items-center gap-4 active:scale-[0.98] transition hover:border-gold/40">
-            <div class="w-12 h-12 rounded-xl bg-gold/15 border border-gold/25 flex items-center justify-center shrink-0 text-gold text-xl font-black">👷</div>
-            <div class="flex-1"><p class="font-extrabold text-[15px]">I'm a Worker</p><p class="text-[11.5px] text-slate-400">Apply for jobs in Dubai &amp; the Gulf. Free.</p></div>
-            <svg class="w-5 h-5 text-slate-500 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
-          </button>
-          <button onclick="selectRole('recruiter')" class="w-full text-left card p-4 flex items-center gap-4 active:scale-[0.98] transition hover:border-gold/40">
-            <div class="w-12 h-12 rounded-xl bg-gold/15 border border-gold/25 flex items-center justify-center shrink-0 text-gold text-xl font-black">🏢</div>
-            <div class="flex-1"><p class="font-extrabold text-[15px]">I'm a Recruitment Office</p><p class="text-[11.5px] text-slate-400">Browse verified worker leads. Pay per unlock.</p></div>
-            <svg class="w-5 h-5 text-slate-500 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
-          </button>
-          <button onclick="selectRole('agent')" class="w-full text-left card p-4 flex items-center gap-4 active:scale-[0.98] transition hover:border-gold/40">
-            <div class="w-12 h-12 rounded-xl bg-gold/15 border border-gold/25 flex items-center justify-center shrink-0 text-gold text-xl font-black">🤝</div>
-            <div class="flex-1"><p class="font-extrabold text-[15px]">I'm an Agent</p><p class="text-[11.5px] text-slate-400">Upload candidates. Earn $1 per unlock.</p></div>
-            <svg class="w-5 h-5 text-slate-500 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
-          </button>
-          <button onclick="selectRole('sourcer')" class="w-full text-left card p-4 flex items-center gap-4 active:scale-[0.98] transition hover:border-gold/40">
-            <div class="w-12 h-12 rounded-xl bg-gold/15 border border-gold/25 flex items-center justify-center shrink-0 text-gold text-xl font-black">🔗</div>
-            <div class="flex-1"><p class="font-extrabold text-[15px]">I'm a Sourcer</p><p class="text-[11.5px] text-slate-400">Refer friends. Earn $3 per unlock.</p></div>
-            <svg class="w-5 h-5 text-slate-500 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
-          </button>
-        </div>
-
         <div class="mt-3 flex items-center justify-center gap-3 text-[10.5px] text-slate-400 font-medium"><span>✓ No fees</span><span class="w-1 h-1 rounded-full bg-slate-600"></span><span>✓ Free visa</span><span class="w-1 h-1 rounded-full bg-slate-600"></span><span>✓ 2 min form</span></div>
       </div>
 
+      <!-- OPEN ROLES -->
       <div class="mt-9">
         <div class="flex items-end justify-between mb-3">
           <h2 class="text-sm font-extrabold tracking-tight">Open Roles</h2>
@@ -104,6 +83,7 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
         </div>
       </div>
 
+      <!-- HOW IT WORKS -->
       <div class="mt-9">
         <h2 class="text-sm font-extrabold tracking-tight mb-3">How It Works</h2>
         <div class="grid grid-cols-3 gap-3">
@@ -113,7 +93,38 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
         </div>
       </div>
 
-      <div class="mt-9 mb-4">
+      <!-- ROLE SELECTION (Moved Here) -->
+      <div class="mt-10 mb-6">
+        <h2 class="text-[18px] font-extrabold tracking-tight text-center mb-4">How will you use <span class="text-gold">WorldBridge?</span></h2>
+        
+        <div class="space-y-3">
+          <button onclick="selectRole('worker')" class="w-full text-left card p-4 flex items-center gap-4 active:scale-[0.98] transition hover:border-gold/40">
+            <div class="w-12 h-12 rounded-xl bg-gold/15 border border-gold/25 flex items-center justify-center shrink-0 text-gold text-xl font-black">👷</div>
+            <div class="flex-1"><p class="font-extrabold text-[15px]">I'm a Worker</p><p class="text-[11.5px] text-slate-400">Apply for jobs in Dubai &amp; the Gulf. Free.</p></div>
+            <svg class="w-5 h-5 text-slate-500 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
+          </button>
+          
+          <button onclick="selectRole('recruiter')" class="w-full text-left card p-4 flex items-center gap-4 active:scale-[0.98] transition hover:border-gold/40">
+            <div class="w-12 h-12 rounded-xl bg-gold/15 border border-gold/25 flex items-center justify-center shrink-0 text-gold text-xl font-black">🏢</div>
+            <div class="flex-1"><p class="font-extrabold text-[15px]">I'm a Recruitment Office</p><p class="text-[11.5px] text-slate-400">Browse verified worker leads. Pay per unlock.</p></div>
+            <svg class="w-5 h-5 text-slate-500 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
+          </button>
+          
+          <button onclick="selectRole('agent')" class="w-full text-left card p-4 flex items-center gap-4 active:scale-[0.98] transition hover:border-gold/40">
+            <div class="w-12 h-12 rounded-xl bg-gold/15 border border-gold/25 flex items-center justify-center shrink-0 text-gold text-xl font-black">🤝</div>
+            <div class="flex-1"><p class="font-extrabold text-[15px]">I'm an Agent</p><p class="text-[11.5px] text-slate-400">Upload candidates. Earn $1 per unlock.</p></div>
+            <svg class="w-5 h-5 text-slate-500 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
+          </button>
+          
+          <button onclick="selectRole('sourcer')" class="w-full text-left card p-4 flex items-center gap-4 active:scale-[0.98] transition hover:border-gold/40">
+            <div class="w-12 h-12 rounded-xl bg-gold/15 border border-gold/25 flex items-center justify-center shrink-0 text-gold text-xl font-black">🔗</div>
+            <div class="flex-1"><p class="font-extrabold text-[15px]">I'm a Sourcer</p><p class="text-[11.5px] text-slate-400">Refer friends. Earn $3 per unlock.</p></div>
+            <svg class="w-5 h-5 text-slate-500 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="mt-2 mb-8">
         <p class="text-center text-[10px] text-slate-500 mt-2 leading-relaxed">WorldBridge Manpower Consultancy · Dubai, UAE<br>We never ask candidates for money.</p>
       </div>
       <div class="h-6"></div>
@@ -326,7 +337,7 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
   const SUPABASE_URL = "https://fnpccciwbwrragpnzyqc.supabase.co";
   const SUPABASE_KEY = "sb_publishable_i1BSTJbZ1nWkMzxJ0NZj-g_mMRA6wvZ";
   const tg = window.Telegram?.WebApp;
-  const TG_ID = tg?.initDataUnsafe?.user?.id || 123456789;
+  const TG_ID = tg?.initDataUnsafe?.user?.id || null;
   let cart = [];
   let currentOrderRef = '';
 
@@ -338,6 +349,54 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
     window.scrollTo(0,0);
   }
   function loading(show) { document.getElementById('loadingOverlay').classList.toggle('hidden', !show); }
+
+  // --- AUTO-LOGIN CHECK ON STARTUP ---
+  async function checkAutoLogin() {
+    if (!TG_ID) {
+      showView('view-role');
+      return;
+    }
+    
+    loading(true);
+    try {
+      let res = await fetch(`${SUPABASE_URL}/rest/v1/gulf_leads?telegram_id=eq.${TG_ID}&select=id`, {
+        headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+      });
+      let data = await res.json();
+      if (data.length > 0) {
+        loading(false); loadWorkerDash(); return;
+      }
+
+      res = await fetch(`${SUPABASE_URL}/rest/v1/recruiters?telegram_id=eq.${TG_ID}&select=telegram_id`, {
+        headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+      });
+      data = await res.json();
+      if (data.length > 0) {
+        loading(false); showView('view-recruiter-dash'); loadRecruiterLeads(); return;
+      }
+
+      res = await fetch(`${SUPABASE_URL}/rest/v1/agents?telegram_id=eq.${TG_ID}&select=telegram_id`, {
+        headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+      });
+      data = await res.json();
+      if (data.length > 0) {
+        loading(false); showView('view-agent-dash'); loadAgentDash(); return;
+      }
+
+      res = await fetch(`${SUPABASE_URL}/rest/v1/sourcers?telegram_id=eq.${TG_ID}&select=telegram_id`, {
+        headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+      });
+      data = await res.json();
+      if (data.length > 0) {
+        loading(false); showView('view-sourcer-dash'); loadSourcerDash(); return;
+      }
+
+      loading(false); showView('view-role');
+    } catch (e) {
+      console.error(e);
+      loading(false); showView('view-role');
+    }
+  }
 
   function selectRole(role) {
     if (role === 'worker') showView('view-worker-reg');
@@ -351,17 +410,37 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
     e.preventDefault(); loading(true);
     const data = Object.fromEntries(new FormData(e.target).entries());
     data.added_by_role = 'worker'; data.telegram_id = TG_ID;
+    
+    const startParam = tg?.initDataUnsafe?.start_param;
+    if (startParam && startParam.startsWith('ref_')) {
+      data.referred_by_sourcer_tg_id = startParam.replace('ref_', '');
+    }
+
     await fetch(`${SUPABASE_URL}/rest/v1/gulf_leads`, {
       method: 'POST', headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' }, body: JSON.stringify(data)
     });
-    loading(false); alert("Application submitted!"); showView('view-worker-dash');
+    loading(false); alert("Application submitted!"); loadWorkerDash();
   });
+
+  async function loadWorkerDash() {
+    showView('view-worker-dash');
+    if (!TG_ID) return;
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/gulf_leads?telegram_id=eq.${TG_ID}&select=*`, {
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+    });
+    const data = await res.json();
+    if (data.length > 0 && data[0].cv) {
+      document.getElementById('workerCvUpdate').value = data[0].cv;
+      document.getElementById('cvStatus').innerHTML = `<a href="${data[0].cv}" target="_blank" class="text-gold underline">View Current CV</a>`;
+    }
+  }
 
   async function updateWorkerCv() {
     const cv = document.getElementById('workerCvUpdate').value;
     await fetch(`${SUPABASE_URL}/rest/v1/gulf_leads?telegram_id=eq.${TG_ID}`, {
       method: 'PATCH', headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ cv })
     });
+    document.getElementById('cvStatus').innerHTML = `<a href="${cv}" target="_blank" class="text-gold underline">View Current CV</a>`;
     alert("CV Updated!");
   }
 
@@ -507,7 +586,8 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
     loading(false); alert("Payout details saved!"); showView('view-sourcer-dash');
   });
 
-  showView('view-role');
+  // --- INIT ---
+  checkAutoLogin();
 </script>
 </body>
 </html>
