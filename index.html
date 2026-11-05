@@ -348,6 +348,29 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
 
   if(tg) { tg.ready(); tg.expand(); }
 
+  // --- SECURE HELPERS ---
+  function escapeHTML(str) {
+    if (!str) return '';
+    return String(str).replace(/[&<>'"]/g, 
+      tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag])
+    );
+  }
+
+  async function rpc(name, body) {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${name}`, {
+      method: 'POST',
+      headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    const out = await res.json().catch(() => null);
+    if (!res.ok) { 
+      console.error(name, out); 
+      alert(`${name} failed: ${out?.message || res.status}`); 
+      throw new Error(name); 
+    }
+    return Array.isArray(out) ? out : (out ? [out] : []);
+  }
+
   function showView(id) {
     document.querySelectorAll('.view').forEach(el => el.classList.add('hidden'));
     document.getElementById(id).classList.remove('hidden');
@@ -398,8 +421,13 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
     e.preventDefault(); loading(true);
     const data = Object.fromEntries(new FormData(e.target).entries());
     data.added_by_role = 'worker'; data.telegram_id = TG_ID;
+    
+    // FIX: Use startapp param from Telegram
     const startParam = tg?.initDataUnsafe?.start_param;
-    if (startParam && startParam.startsWith('ref_')) data.referred_by_sourcer_tg_id = startParam.replace('ref_', '');
+    if (startParam && startParam.startsWith('ref_')) {
+        data.referred_by_sourcer_tg_id = startParam.replace('ref_', '');
+    }
+    
     await fetch(`${SUPABASE_URL}/rest/v1/gulf_leads`, { method: 'POST', headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
     loading(false); alert("Application submitted!"); loadWorkerDash();
   });
@@ -411,7 +439,7 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
     const data = await res.json();
     if (data.length > 0 && data[0].cv) {
       document.getElementById('workerCvUpdate').value = data[0].cv;
-      document.getElementById('cvStatus').innerHTML = `<a href="${data[0].cv}" target="_blank" class="text-gold underline font-bold">✓ View Current CV</a>`;
+      document.getElementById('cvStatus').innerHTML = `<a href="${escapeHTML(data[0].cv)}" target="_blank" class="text-gold underline font-bold">✓ View Current CV</a>`;
     }
   }
 
@@ -419,7 +447,7 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
     const cv = document.getElementById('workerCvUpdate').value;
     if(!cv) return;
     await fetch(`${SUPABASE_URL}/rest/v1/gulf_leads?telegram_id=eq.${TG_ID}`, { method: 'PATCH', headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ cv }) });
-    document.getElementById('cvStatus').innerHTML = `<a href="${cv}" target="_blank" class="text-gold underline font-bold">✓ View Current CV</a>`;
+    document.getElementById('cvStatus').innerHTML = `<a href="${escapeHTML(cv)}" target="_blank" class="text-gold underline font-bold">✓ View Current CV</a>`;
     alert("CV Updated!");
   }
 
@@ -451,10 +479,10 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
 
     document.getElementById('recruiterLeadsList').innerHTML = leads.map(l => `
       <div class="card p-4 flex gap-3 items-center bg-navysoft/50">
-        <input type="checkbox" value="${l.id}" onchange="toggleCart(this)" class="w-5 h-5 accent-gold rounded cursor-pointer">
+        <input type="checkbox" value="${escapeHTML(l.id)}" onchange="toggleCart(this)" class="w-5 h-5 accent-gold rounded cursor-pointer">
         <div class="flex-1 cursor-pointer" onclick="this.parentElement.querySelector('input').click()">
-          <p class="font-bold text-[13.5px]">${l.name_masked}</p>
-          <p class="text-[11px] text-slate-400">${l.job} · ${l.qualification} · ${l.experience}</p>
+          <p class="font-bold text-[13.5px]">${escapeHTML(l.name_masked)}</p>
+          <p class="text-[11px] text-slate-400">${escapeHTML(l.job)} · ${escapeHTML(l.qualification)} · ${escapeHTML(l.experience)}</p>
         </div>
         <div class="text-emerald-400 text-[9px] font-extrabold tracking-wider px-2 py-1 bg-emerald-500/10 rounded border border-emerald-500/20">${l.passport ? 'PASSPORT ✓' : 'NO PP'}</div>
       </div>
@@ -509,13 +537,8 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
     const data = await res.json();
     if (data.length > 0) document.getElementById('agentEarnings').textContent = data[0].total_earnings;
 
-    // FETCH VIA SECURE RPC
-    const leadsRes = await fetch(`${SUPABASE_URL}/rest/v1/rpc/get_agent_candidates`, { 
-      method: 'POST', 
-      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ p_agent_tg_id: TG_ID })
-    });
-    const leads = await leadsRes.json();
+    // FIX: Use the secure RPC helper
+    const leads = await rpc('get_agent_candidates', { p_agent_tg_id: TG_ID });
     
     document.getElementById('agentCount').textContent = `${leads.length} Total`;
 
@@ -528,12 +551,12 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
       <div class="card p-4 bg-navysoft/50">
         <div class="flex justify-between items-start mb-2">
           <div>
-            <p class="font-bold text-[13.5px]">${l.name}</p>
-            <p class="text-[11px] text-slate-400">${l.job} · ${l.qualification}</p>
+            <p class="font-bold text-[13.5px]">${escapeHTML(l.name)}</p>
+            <p class="text-[11px] text-slate-400">${escapeHTML(l.job)} · ${escapeHTML(l.qualification)}</p>
           </div>
-          <span class="text-[9px] font-extrabold px-2 py-1 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">${l.status.toUpperCase()}</span>
+          <span class="text-[9px] font-extrabold px-2 py-1 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">${(l.status || 'pending').toUpperCase()}</span>
         </div>
-        <p class="text-[11px] text-slate-500 mt-2 font-mono">📞 ${l.phone}</p>
+        <p class="text-[11px] text-slate-500 mt-2 font-mono">📞 ${escapeHTML(l.phone)}</p>
       </div>
     `).join('');
   }
@@ -542,20 +565,16 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
     e.preventDefault(); loading(true);
     const data = Object.fromEntries(new FormData(e.target).entries());
     
-    // SAVE VIA SECURE RPC
-    await fetch(`${SUPABASE_URL}/rest/v1/rpc/agent_add_candidate`, { 
-      method: 'POST', 
-      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' }, 
-      body: JSON.stringify({ 
-        p_agent_tg_id: TG_ID, 
-        p_name: data.name, 
-        p_phone: data.phone, 
-        p_email: data.email, 
-        p_job: data.job, 
-        p_qualification: data.qualification, 
-        p_experience: data.experience, 
-        p_cv: data.cv 
-      }) 
+    // FIX: Use the secure RPC helper
+    await rpc('agent_add_candidate', { 
+      p_agent_tg_id: TG_ID, 
+      p_name: data.name, 
+      p_phone: data.phone, 
+      p_email: data.email, 
+      p_job: data.job, 
+      p_qualification: data.qualification, 
+      p_experience: data.experience, 
+      p_cv: data.cv 
     });
     
     loading(false); showView('view-agent-dash'); loadAgentDash();
@@ -573,44 +592,31 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
     e.preventDefault(); loading(true);
     const data = Object.fromEntries(new FormData(e.target).entries());
     
-    // SAVE VIA SECURE RPC
-    await fetch(`${SUPABASE_URL}/rest/v1/rpc/create_sourcer_profile`, {
-      method: 'POST', 
-      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ 
-        p_name: data.name, 
-        p_email: data.email, 
-        p_phone: data.phone, 
-        p_address: data.address, 
-        p_traffic_source: data.traffic_source, 
-        p_tg_id: TG_ID 
-      })
+    // FIX: Use the secure RPC helper
+    await rpc('create_sourcer_profile', { 
+      p_name: data.name, 
+      p_email: data.email, 
+      p_phone: data.phone, 
+      p_address: data.address, 
+      p_traffic_source: data.traffic_source, 
+      p_tg_id: TG_ID 
     });
     
     loading(false); showView('view-sourcer-dash'); loadSourcerDash();
   });
 
   async function loadSourcerDash() {
-    // FETCH VIA SECURE RPC
-    const dataRes = await fetch(`${SUPABASE_URL}/rest/v1/rpc/get_sourcer_profile`, { 
-      method: 'POST', 
-      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ p_tg_id: TG_ID })
-    });
-    const data = await dataRes.json();
+    // FIX: Use the secure RPC helper
+    const data = await rpc('get_sourcer_profile', { p_tg_id: TG_ID });
     
     if (data && data.length > 0) {
       document.getElementById('sourcerEarnings').textContent = data[0].total_earnings;
-      document.getElementById('refLink').textContent = `t.me/WorldBridgeBot?start=ref_${data[0].referral_code}`;
+      // FIX: Use the correct Telegram startapp link format
+      document.getElementById('refLink').textContent = `t.me/WorldBridgeBot/YOUR_APP_SHORTNAME?startapp=ref_${data[0].referral_code}`;
     }
 
-    // FETCH VIA SECURE RPC
-    const leadsRes = await fetch(`${SUPABASE_URL}/rest/v1/rpc/get_sourcer_referrals`, { 
-      method: 'POST', 
-      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ p_sourcer_tg_id: TG_ID })
-    });
-    const leads = await leadsRes.json();
+    // FIX: Use the secure RPC helper
+    const leads = await rpc('get_sourcer_referrals', { p_sourcer_tg_id: TG_ID });
     
     document.getElementById('sourcerCount').textContent = `${leads.length} Referrals`;
 
@@ -623,8 +629,8 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
       <div class="card p-4 bg-navysoft/50">
         <div class="flex justify-between items-start">
           <div>
-            <p class="font-bold text-[13.5px]">${l.name}</p>
-            <p class="text-[11px] text-slate-400">${l.job} · ${l.location || 'Nigeria'}</p>
+            <p class="font-bold text-[13.5px]">${escapeHTML(l.name)}</p>
+            <p class="text-[11px] text-slate-400">${escapeHTML(l.job)} · ${escapeHTML(l.location || 'Nigeria')}</p>
           </div>
           <span class="text-[9px] font-extrabold px-2 py-1 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">${l.passport ? 'PASSPORT ✓' : 'REFERRED'}</span>
         </div>
