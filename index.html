@@ -4,1175 +4,471 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#0F172A">
-<title>WorldBridge — Dubai &amp; Gulf Jobs</title>
-
+<title>WorldBridge</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script src="https://cdn.tailwindcss.com"></script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-
 <script>
-tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B',gold:'#F59E0B'}, fontFamily:{sans:['Inter','ui-sans-serif','system-ui','sans-serif']} } } };
+tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B',gold:'#F59E0B'}, fontFamily:{sans:['Inter','sans-serif']} } } };
 </script>
-
 <style type="text/tailwindcss">
   @layer components {
     .label { @apply block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5; }
-    .input { @apply w-full rounded-xl bg-white/5 border border-white/10 px-4 py-3 text-sm text-white placeholder-slate-500 outline-none transition focus:border-gold focus:bg-white/[0.07] focus:ring-2 focus:ring-gold/20; }
-    .select { @apply w-full rounded-xl bg-white/5 border border-white/10 px-4 py-3 text-sm text-white outline-none transition appearance-none pr-10 focus:border-gold focus:bg-white/[0.07] focus:ring-2 focus:ring-gold/20; background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394A3B8' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='m19 9-7 7-7-7'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 0.85rem center; background-size: 1rem; }
+    .input { @apply w-full rounded-xl bg-white/5 border border-white/10 px-4 py-3 text-sm text-white placeholder-slate-500 outline-none transition focus:border-gold; }
     .card { @apply rounded-2xl bg-white/5 border border-white/10; }
+    .btn { @apply w-full rounded-2xl bg-gold text-navy font-extrabold text-[15px] py-4 active:scale-[0.98] transition; }
   }
 </style>
-
 <style>
-  html, body { -webkit-tap-highlight-color: transparent; }
-  body { overscroll-behavior-y: none; }
+  body { -webkit-tap-highlight-color: transparent; overscroll-behavior-y: none; }
   select option { color: #0F172A; background: #FFFFFF; }
   .spinner { width:18px; height:18px; border:2.5px solid rgba(15,23,42,.25); border-top-color:#0F172A; border-radius:50%; animation: spin .7s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
   .fade-in { animation: fadeIn .35s ease both; }
   @keyframes fadeIn { from { opacity:0; transform: translateY(8px);} to { opacity:1; transform:translateY(0);} }
-  .safe-bottom { padding-bottom: calc(1.5rem + env(safe-area-inset-bottom)); }
 </style>
 </head>
-
 <body class="bg-navy text-white font-sans antialiased selection:bg-gold selection:text-navy">
-<div class="min-h-screen w-full">
 
-  <!-- VIEW 0 — ROLE -->
+<div id="app" class="min-h-screen w-full">
+
+  <!-- VIEW: ROLE SELECT -->
   <section id="view-role" class="view">
     <div class="max-w-md mx-auto px-5 min-h-screen flex flex-col justify-center py-12 fade-in">
       <div class="flex items-center gap-2.5 mb-8">
         <div class="w-11 h-11 rounded-xl bg-gold flex items-center justify-center text-navy font-black text-xl shadow-lg shadow-gold/20">W</div>
-        <div class="leading-tight">
-          <p class="font-extrabold tracking-tight text-lg">WorldBridge</p>
-          <p class="text-[9.5px] text-gold font-bold tracking-[0.18em] uppercase">Dubai · UAE · Gulf</p>
-        </div>
+        <div class="leading-tight"><p class="font-extrabold tracking-tight text-lg">WorldBridge</p><p class="text-[9.5px] text-gold font-bold tracking-[0.18em] uppercase">Dubai · UAE · Gulf</p></div>
       </div>
       <h1 class="text-[28px] leading-tight font-extrabold tracking-tight">How will you use<br><span class="text-gold">WorldBridge?</span></h1>
-      <p class="mt-3 text-[13px] leading-relaxed text-slate-400">Choose your account type. You can switch later.</p>
       <div class="mt-7 space-y-3">
-        <button id="roleWorker" type="button" class="w-full text-left card p-4 flex items-center gap-4 active:scale-[0.98] transition hover:border-gold/40">
-          <div class="w-12 h-12 rounded-xl bg-gold/15 border border-gold/25 flex items-center justify-center shrink-0">
-            <svg class="w-6 h-6 text-gold" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-          </div>
-          <div class="flex-1 min-w-0">
-            <p class="font-extrabold text-[15px] leading-tight">I'm a Worker</p>
-            <p class="text-[11.5px] text-slate-400 mt-0.5 leading-snug">Apply for jobs in Dubai &amp; the Gulf. Free.</p>
-          </div>
-          <svg class="w-5 h-5 text-slate-500 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+        <button onclick="selectRole('worker')" class="w-full text-left card p-4 flex items-center gap-4 active:scale-[0.98] hover:border-gold/40">
+          <div class="w-12 h-12 rounded-xl bg-gold/15 border border-gold/25 flex items-center justify-center shrink-0 text-gold text-xl font-black">👷</div>
+          <div class="flex-1"><p class="font-extrabold text-[15px]">I'm a Worker</p><p class="text-[11.5px] text-slate-400">Apply for jobs for free.</p></div>
         </button>
-        <button id="roleEmployer" type="button" class="w-full text-left card p-4 flex items-center gap-4 active:scale-[0.98] transition hover:border-gold/40">
-          <div class="w-12 h-12 rounded-xl bg-gold/15 border border-gold/25 flex items-center justify-center shrink-0">
-            <svg class="w-6 h-6 text-gold" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V7l7-4 7 4v14"/><path d="M9 9h1M9 13h1M9 17h1M14 9h1M14 13h1M14 17h1"/></svg>
-          </div>
-          <div class="flex-1 min-w-0">
-            <p class="font-extrabold text-[15px] leading-tight">I'm a Recruitment Office</p>
-            <p class="text-[11.5px] text-slate-400 mt-0.5 leading-snug">Browse verified worker leads. Pay per unlock.</p>
-          </div>
-          <svg class="w-5 h-5 text-slate-500 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+        <button onclick="selectRole('recruiter')" class="w-full text-left card p-4 flex items-center gap-4 active:scale-[0.98] hover:border-gold/40">
+          <div class="w-12 h-12 rounded-xl bg-gold/15 border border-gold/25 flex items-center justify-center shrink-0 text-gold text-xl font-black">🏢</div>
+          <div class="flex-1"><p class="font-extrabold text-[15px]">I'm a Recruiter</p><p class="text-[11.5px] text-slate-400">Hire verified workers.</p></div>
+        </button>
+        <button onclick="selectRole('agent')" class="w-full text-left card p-4 flex items-center gap-4 active:scale-[0.98] hover:border-gold/40">
+          <div class="w-12 h-12 rounded-xl bg-gold/15 border border-gold/25 flex items-center justify-center shrink-0 text-gold text-xl font-black">🤝</div>
+          <div class="flex-1"><p class="font-extrabold text-[15px]">I'm an Agent</p><p class="text-[11.5px] text-slate-400">Upload candidates. Earn $1/unlock.</p></div>
+        </button>
+        <button onclick="selectRole('sourcer')" class="w-full text-left card p-4 flex items-center gap-4 active:scale-[0.98] hover:border-gold/40">
+          <div class="w-12 h-12 rounded-xl bg-gold/15 border border-gold/25 flex items-center justify-center shrink-0 text-gold text-xl font-black">🔗</div>
+          <div class="flex-1"><p class="font-extrabold text-[15px]">I'm a Sourcer</p><p class="text-[11.5px] text-slate-400">Refer friends. Earn $3/unlock.</p></div>
         </button>
       </div>
-      <p class="text-center text-[10px] text-slate-500 mt-8 leading-relaxed">WorldBridge Manpower Consultancy · Dubai, UAE<br>We never ask workers for money.</p>
     </div>
   </section>
 
-  <!-- VIEW 1 — WORKER WELCOME -->
-  <section id="view-welcome" class="view hidden">
-    <header class="sticky top-0 z-30 bg-navy/85 backdrop-blur-xl border-b border-white/10">
-      <div class="max-w-md mx-auto px-5 py-3 flex items-center justify-between">
-        <div class="flex items-center gap-2.5">
-          <div class="w-9 h-9 rounded-xl bg-gold flex items-center justify-center text-navy font-black text-lg shadow-lg shadow-gold/20">W</div>
-          <div class="leading-tight">
-            <p class="font-extrabold tracking-tight text-[15px]">WorldBridge</p>
-            <p class="text-[9px] text-gold font-bold tracking-[0.18em] uppercase">Dubai · UAE · Gulf</p>
-          </div>
-        </div>
-        <span class="text-[10px] font-extrabold px-2.5 py-1 rounded-full bg-gold/15 text-gold border border-gold/30">FREE</span>
-      </div>
-    </header>
-    <div class="max-w-md mx-auto px-5">
-      <div class="pt-8">
-        <div class="inline-flex items-center gap-2 rounded-full bg-white/5 border border-white/10 px-3 py-1.5">
-          <span class="w-1.5 h-1.5 rounded-full bg-gold animate-pulse"></span>
-          <span class="text-[11px] font-extrabold tracking-widest uppercase text-gold">Employer Pays</span>
-        </div>
-        <h1 class="mt-4 text-[34px] leading-[1.1] font-extrabold tracking-tight">Your Gateway to<br><span class="text-gold">Dubai &amp; Gulf</span> Jobs</h1>
-        <p class="mt-3.5 text-[13.5px] leading-relaxed text-slate-300">Verified Gulf employers. <span class="text-white font-semibold">Zero placement fees.</span> Free visa, accommodation and flight ticket — the employer pays, not you.</p>
-        <button id="startBtn" type="button" class="mt-6 w-full rounded-2xl bg-gold text-navy font-extrabold text-[15px] py-4 shadow-xl shadow-gold/25 active:scale-[0.98] transition">Apply Now — It's Free</button>
-        <div class="mt-3 flex items-center justify-center gap-3 text-[10.5px] text-slate-400 font-medium"><span>✓ No fees</span><span class="w-1 h-1 rounded-full bg-slate-600"></span><span>✓ Free visa</span><span class="w-1 h-1 rounded-full bg-slate-600"></span><span>✓ 2 min form</span></div>
-      </div>
-      <div class="mt-9">
-        <div class="flex items-end justify-between mb-3">
-          <h2 class="text-sm font-extrabold tracking-tight">Open Roles</h2>
-          <span class="text-[10.5px] font-semibold text-gold">Visa · Accommodation · Ticket</span>
-        </div>
-        <div class="grid grid-cols-2 gap-3">
-          <div class="card overflow-hidden"><img src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=500&q=70" alt="Caregiver" loading="lazy" class="h-24 w-full object-cover"><div class="p-3"><p class="text-[13px] font-extrabold leading-tight">Caregiver</p><p class="text-[10.5px] text-slate-400 mt-0.5">Homes &amp; Clinics</p></div></div>
-          <div class="card overflow-hidden"><img src="https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?auto=format&fit=crop&w=500&q=70" alt="Driver" loading="lazy" class="h-24 w-full object-cover"><div class="p-3"><p class="text-[13px] font-extrabold leading-tight">Driver</p><p class="text-[10.5px] text-slate-400 mt-0.5">Light &amp; Heavy</p></div></div>
-          <div class="card overflow-hidden"><img src="https://images.unsplash.com/photo-1590650153855-d9e808231d41?auto=format&fit=crop&w=500&q=70" alt="Security" loading="lazy" class="h-24 w-full object-cover"><div class="p-3"><p class="text-[13px] font-extrabold leading-tight">Security</p><p class="text-[10.5px] text-slate-400 mt-0.5">Guard &amp; CCTV</p></div></div>
-          <div class="card overflow-hidden"><img src="https://images.unsplash.com/photo-1553413077-190dd305871c?auto=format&fit=crop&w=500&q=70" alt="Warehouse" loading="lazy" class="h-24 w-full object-cover"><div class="p-3"><p class="text-[13px] font-extrabold leading-tight">Warehouse</p><p class="text-[10.5px] text-slate-400 mt-0.5">Factory &amp; Logistics</p></div></div>
-        </div>
-      </div>
-      <div class="mt-9">
-        <h2 class="text-sm font-extrabold tracking-tight mb-3">How It Works</h2>
-        <div class="grid grid-cols-3 gap-3">
-          <div class="card p-3 text-center"><div class="mx-auto w-8 h-8 rounded-full bg-gold text-navy font-black text-[13px] flex items-center justify-center">1</div><p class="mt-2 text-[12px] font-extrabold">Apply</p><p class="text-[10px] text-slate-400 mt-0.5">2 minutes</p></div>
-          <div class="card p-3 text-center"><div class="mx-auto w-8 h-8 rounded-full bg-gold text-navy font-black text-[13px] flex items-center justify-center">2</div><p class="mt-2 text-[12px] font-extrabold">Verify</p><p class="text-[10px] text-slate-400 mt-0.5">Docs &amp; call</p></div>
-          <div class="card p-3 text-center"><div class="mx-auto w-8 h-8 rounded-full bg-gold text-navy font-black text-[13px] flex items-center justify-center">3</div><p class="mt-2 text-[12px] font-extrabold">Fly</p><p class="text-[10px] text-slate-400 mt-0.5">Visa &amp; ticket</p></div>
-        </div>
-      </div>
-      <div class="mt-9 mb-4">
-        <button type="button" data-start class="w-full rounded-2xl bg-white text-navy font-extrabold text-[14px] py-3.5 active:scale-[0.98] transition">Start My Free Application</button>
-        <button type="button" data-switch-role class="w-full mt-3 text-[11px] text-slate-500 font-semibold py-2 active:scale-95 transition">Switch account type</button>
-        <p class="text-center text-[10px] text-slate-500 mt-2 leading-relaxed">WorldBridge Manpower Consultancy · Dubai, UAE<br>We never ask candidates for money.</p>
-      </div>
-      <div class="h-6"></div>
-    </div>
-  </section>
-
-  <!-- VIEW 2 — WORKER FORM -->
-  <section id="view-form" class="view hidden">
-    <header class="sticky top-0 z-30 bg-navy/85 backdrop-blur-xl border-b border-white/10">
-      <div class="max-w-md mx-auto px-5 py-3 flex items-center gap-3">
-        <button type="button" data-back class="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center active:scale-95 transition"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></button>
-        <div class="leading-tight">
-          <p class="font-extrabold text-[15px] tracking-tight">Application Form</p>
-          <p class="text-[10px] text-slate-400 font-medium">Step 1 of 1 · Takes 2 minutes</p>
-        </div>
-      </div>
-    </header>
-    <div class="max-w-md mx-auto px-5 pt-6 safe-bottom">
-      <div class="card p-4 flex items-start gap-3 border-gold/25 bg-gold/[0.07]">
-        <svg class="w-5 h-5 text-gold shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="m9 12 2 2 4-4"/></svg>
-        <p class="text-[11.5px] leading-relaxed text-slate-300"><span class="text-white font-bold">100% free.</span> Your details are sent directly to our Dubai recruitment desk. No agent fees at any stage.</p>
-      </div>
-      <form id="leadForm" class="mt-5 space-y-4" autocomplete="on">
-        <div><label class="label" for="name">Full Name *</label><input class="input" id="name" name="name" type="text" placeholder="e.g. Musa Abdullahi" autocomplete="name" required></div>
-        <div>
-          <label class="label" for="phone">Phone Number *</label>
-          <div class="flex gap-2">
-            <input class="input" id="phone" name="phone" type="tel" placeholder="+234 801 234 5678" autocomplete="tel" inputmode="tel" required>
-            <button type="button" id="tgPhoneBtn" class="shrink-0 px-3.5 rounded-xl bg-white/5 border border-white/10 text-gold active:scale-95 transition flex items-center justify-center" title="Use Telegram number">
-              <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.12 4.2 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.1 9.9a16 16 0 0 0 6 6l1.26-1.26a2 2 0 0 1 2.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92Z"/></svg>
-            </button>
-          </div>
-          <p class="text-[10px] text-slate-500 mt-1.5">Tap the icon to use your Telegram number.</p>
-        </div>
-        <div><label class="label" for="email">Email <span class="text-slate-600 normal-case font-medium">(optional)</span></label><input class="input" id="email" name="email" type="email" placeholder="you@example.com" autocomplete="email"></div>
-        <div>
-          <label class="label" for="location">Current Location *</label>
-          <select class="select" id="location" name="location" required>
-            <option value="" disabled selected>Select your state</option>
-            <option>Kwara</option><option>Lagos</option><option>Abuja (FCT)</option><option>Oyo / Ibadan</option><option>Kano</option><option>Kaduna</option><option>Rivers / Port Harcourt</option><option>Edo / Benin City</option><option>Enugu</option><option>Anambra</option><option>Ogun</option><option>Delta</option><option>Other</option>
-          </select>
-        </div>
-        <div>
-          <label class="label" for="job">Job Interested In *</label>
-          <select class="select" id="job" name="job" required>
-            <option value="" disabled selected>Select a role</option>
-            <option>Caregiver</option><option>Driver</option><option>Security</option><option>Factory</option><option>Warehouse</option><option>Electrician</option><option>Plumber</option><option>Cleaner</option>
-          </select>
-        </div>
-        <div>
-          <label class="label" for="qualification">Highest Qualification *</label>
-          <select class="select" id="qualification" name="qualification" required>
-            <option value="" disabled selected>Select qualification</option>
-            <option>None / Primary</option><option>SSCE / WASSCE</option><option>OND / NCE</option><option>HND / BSc</option><option>MSc / PhD</option><option>Trade / Vocational Certificate</option>
-          </select>
-        </div>
-        <div>
-          <label class="label" for="experience">Work Experience *</label>
-          <select class="select" id="experience" name="experience" required>
-            <option value="" disabled selected>Select experience</option>
-            <option>No experience</option><option>Less than 1 year</option><option>1 – 2 years</option><option>3 – 5 years</option><option>5+ years</option>
-          </select>
-        </div>
-        <div>
-          <label class="label">Do you have a valid passport? *</label>
-          <div class="grid grid-cols-2 gap-3">
-            <label class="cursor-pointer"><input type="radio" name="passport" value="Yes" class="peer sr-only" required><div class="rounded-xl bg-white/5 border border-white/10 py-3 text-center text-sm font-bold text-slate-300 peer-checked:bg-gold peer-checked:text-navy peer-checked:border-gold transition">Yes</div></label>
-            <label class="cursor-pointer"><input type="radio" name="passport" value="No" class="peer sr-only"><div class="rounded-xl bg-white/5 border border-white/10 py-3 text-center text-sm font-bold text-slate-300 peer-checked:bg-gold peer-checked:text-navy peer-checked:border-gold transition">No</div></label>
-          </div>
-        </div>
-        <div id="passportWrap" class="hidden">
-          <label class="label" for="passportLast4">Last 4 Digits of Passport No. *</label>
-          <input class="input tracking-[0.35em] font-bold" id="passportLast4" name="passportLast4" type="text" inputmode="numeric" maxlength="4" pattern="[A-Za-z0-9]{4}" placeholder="1234">
-        </div>
-        <div>
-          <label class="label" for="ready">When Can You Travel? *</label>
-          <select class="select" id="ready" name="ready" required>
-            <option value="" disabled selected>Select availability</option>
-            <option>Immediately</option><option>Within 1 month</option><option>1 – 3 months</option><option>Just exploring</option>
-          </select>
-        </div>
-        <div><label class="label" for="cv">CV / Portfolio Link <span class="text-slate-600 normal-case font-medium">(optional)</span></label><input class="input" id="cv" name="cv" type="text" placeholder="Google Drive / Dropbox link"></div>
-        <label class="flex items-start gap-3 cursor-pointer pt-1">
-          <input type="checkbox" id="agree" name="agree" required class="mt-0.5 w-5 h-5 shrink-0 rounded-md bg-white/5 border border-white/20 text-gold focus:ring-gold/40 focus:ring-offset-0 accent-gold">
-          <span class="text-[11.5px] leading-relaxed text-slate-400">I confirm my details are correct and I agree to be contacted by WorldBridge about Gulf job opportunities. I understand <span class="text-white font-semibold">no payment is required</span>.</span>
-        </label>
-        <div id="formError" class="hidden rounded-xl bg-red-500/10 border border-red-500/30 px-4 py-3"><p class="text-[11.5px] text-red-300 font-medium leading-relaxed" id="formErrorText"></p></div>
-        <button id="submitBtn" type="submit" class="w-full rounded-2xl bg-gold text-navy font-extrabold text-[15px] py-4 shadow-xl shadow-gold/25 active:scale-[0.98] transition flex items-center justify-center gap-2.5 disabled:opacity-70 disabled:active:scale-100">
-          <span id="btnSpinner" class="spinner hidden"></span><span id="btnText">Submit Application</span>
-        </button>
-        <p class="text-center text-[10px] text-slate-500 pb-2">Your application goes straight to our Dubai office.</p>
+  <!-- WORKER VIEWS -->
+  <section id="view-worker-reg" class="view hidden">
+    <div class="max-w-md mx-auto px-5 pt-8 safe-bottom">
+      <button onclick="showView('view-role')" class="mb-4 text-slate-400 text-sm">← Back</button>
+      <h2 class="text-xl font-extrabold mb-4">Worker Registration</h2>
+      <form id="workerForm" class="space-y-4">
+        <input class="input" name="name" placeholder="Full Name" required>
+        <input class="input" name="phone" type="tel" placeholder="WhatsApp Number" required>
+        <input class="input" name="email" type="email" placeholder="Email (Optional)">
+        <select class="input text-white bg-navy" name="job" required>
+          <option value="">Select Job...</option>
+          <option>Caregiver</option><option>Driver</option><option>Security</option><option>Factory</option><option>Warehouse</option>
+        </select>
+        <select class="input text-white bg-navy" name="qualification" required>
+          <option value="">Qualification...</option>
+          <option>SSCE</option><option>OND</option><option>HND/BSc</option><option>Trade Cert</option>
+        </select>
+        <select class="input text-white bg-navy" name="experience" required>
+          <option value="">Experience...</option>
+          <option>None</option><option>1-2 Years</option><option>3-5 Years</option>
+        </select>
+        <input class="input" name="cv" placeholder="CV Link (Google Drive)">
+        <button type="submit" class="btn">Submit Application</button>
       </form>
     </div>
   </section>
 
-  <!-- VIEW 3 — WORKER SUCCESS -->
-  <section id="view-success" class="view hidden">
-    <div class="max-w-md mx-auto px-6 min-h-screen flex flex-col items-center justify-center text-center py-12 fade-in">
-      <div class="w-24 h-24 rounded-full bg-gold/15 border border-gold/30 flex items-center justify-center shadow-2xl shadow-gold/10">
-        <svg class="w-12 h-12 text-gold" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
-      </div>
-      <h1 class="mt-7 text-[26px] font-extrabold tracking-tight leading-tight">Application Received</h1>
-      <p class="mt-3 text-[13.5px] leading-relaxed text-slate-300 max-w-xs">Thank you! Our Dubai recruitment team will review your profile and contact you on <span class="text-white font-semibold">WhatsApp or Telegram</span> within 48 hours.</p>
-      <div class="mt-7 w-full card p-4 text-left space-y-2.5">
-        <div class="flex items-center gap-2.5"><span class="w-1.5 h-1.5 rounded-full bg-gold shrink-0"></span><p class="text-[12px] text-slate-300">Keep your phone reachable this week.</p></div>
-        <div class="flex items-center gap-2.5"><span class="w-1.5 h-1.5 rounded-full bg-gold shrink-0"></span><p class="text-[12px] text-slate-300">Prepare your passport &amp; CV for verification.</p></div>
-        <div class="flex items-center gap-2.5"><span class="w-1.5 h-1.5 rounded-full bg-gold shrink-0"></span><p class="text-[12px] text-slate-300">You will never be asked for money.</p></div>
-      </div>
-      <button id="closeBtn" type="button" class="mt-8 w-full rounded-2xl bg-gold text-navy font-extrabold text-[15px] py-4 shadow-xl shadow-gold/25 active:scale-[0.98] transition">Close</button>
-      <p class="mt-5 text-[10px] text-slate-500">WorldBridge Manpower Consultancy · Dubai, UAE</p>
-    </div>
-  </section>
-
-  <!-- VIEW 4 — WORKER DASHBOARD -->
   <section id="view-worker-dash" class="view hidden">
-    <header class="sticky top-0 z-30 bg-navy/85 backdrop-blur-xl border-b border-white/10">
-      <div class="max-w-md mx-auto px-5 py-3 flex items-center justify-between">
-        <div class="flex items-center gap-2.5">
-          <div class="w-9 h-9 rounded-xl bg-gold flex items-center justify-center text-navy font-black text-lg shadow-lg shadow-gold/20">W</div>
-          <div class="leading-tight">
-            <p class="font-extrabold tracking-tight text-[15px]">Worker Dashboard</p>
-            <p class="text-[9px] text-gold font-bold tracking-[0.18em] uppercase">My Profile</p>
-          </div>
-        </div>
-        <button type="button" data-switch-role class="text-[10px] font-extrabold px-2.5 py-1.5 rounded-full bg-white/5 border border-white/10 text-slate-300 active:scale-95 transition shrink-0">Switch</button>
-      </div>
+    <header class="p-4 border-b border-white/10 flex justify-between items-center bg-navy/90 sticky top-0">
+      <h1 class="font-extrabold text-[15px]">My Dashboard</h1>
+      <button onclick="showView('view-role')" class="text-xs bg-white/10 px-3 py-1 rounded">Switch</button>
     </header>
-    <div class="max-w-md mx-auto px-5 pt-5 safe-bottom">
-      <div class="card p-4">
-        <div class="flex items-center gap-3">
-          <div class="w-12 h-12 rounded-full bg-gold/15 border border-gold/25 flex items-center justify-center text-gold text-xl font-black" id="workerInitial">M</div>
-          <div class="flex-1 min-w-0">
-            <p class="text-[15px] font-extrabold truncate" id="workerName">Loading...</p>
-            <p class="text-[11.5px] text-slate-400 truncate" id="workerJob">Loading...</p>
-          </div>
-          <span class="text-[9px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/25" id="workerStatus">ACTIVE</span>
+    <div class="max-w-md mx-auto p-5">
+      <div class="card p-4 mb-4">
+        <h2 class="font-bold text-sm mb-2">My CV / Resume</h2>
+        <div class="flex gap-2">
+          <input type="text" id="workerCvUpdate" class="input text-xs" placeholder="CV Link...">
+          <button onclick="updateWorkerCv()" class="bg-gold text-navy font-bold px-4 rounded-xl text-xs">Save</button>
         </div>
+        <p id="cvStatus" class="text-[10px] text-slate-500 mt-2">No CV uploaded yet.</p>
       </div>
-      <div class="mt-4">
-        <h2 class="text-sm font-extrabold tracking-tight mb-2">My CV / Resume</h2>
-        <div class="card p-4">
-          <label class="label" for="updateCvLink">CV Link (Google Drive, Dropbox, etc.)</label>
-          <div class="flex gap-2">
-            <input class="input" id="updateCvLink" type="text" placeholder="Paste link here...">
-            <button id="updateCvBtn" class="shrink-0 px-4 rounded-xl bg-gold text-navy font-extrabold text-[12px] active:scale-95 transition">Save</button>
-          </div>
-          <p id="cvStatus" class="text-[10px] text-slate-500 mt-2">No CV uploaded yet.</p>
-        </div>
-      </div>
-      <div class="mt-6 mb-6">
-        <h2 class="text-sm font-extrabold tracking-tight mb-2">Interview Invitations</h2>
-        <div id="interviewsList" class="space-y-2">
-          <p class="text-[11.5px] text-slate-500 text-center py-4">Checking for updates...</p>
-        </div>
+      <h2 class="font-bold text-sm mb-2">Notifications</h2>
+      <div id="workerNotifications" class="space-y-2">
+        <p class="text-xs text-slate-500">No new notifications.</p>
       </div>
     </div>
   </section>
 
-  <!-- VIEW 5 — EMPLOYER REGISTER -->
-  <section id="view-employer-reg" class="view hidden">
-    <header class="sticky top-0 z-30 bg-navy/85 backdrop-blur-xl border-b border-white/10">
-      <div class="max-w-md mx-auto px-5 py-3 flex items-center gap-3">
-        <button type="button" data-back-role class="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center active:scale-95 transition"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></button>
-        <div class="leading-tight">
-          <p class="font-extrabold text-[15px] tracking-tight">Recruitment Account</p>
-          <p class="text-[10px] text-slate-400 font-medium">One-time registration</p>
-        </div>
-      </div>
-    </header>
-    <div class="max-w-md mx-auto px-5 pt-6 safe-bottom">
-      <div class="card p-4 flex items-start gap-3 border-gold/25 bg-gold/[0.07]">
-        <svg class="w-5 h-5 text-gold shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V7l7-4 7 4v14"/><path d="M9 9h1M9 13h1M9 17h1M14 9h1M14 13h1M14 17h1"/></svg>
-        <p class="text-[11.5px] leading-relaxed text-slate-300"><span class="text-white font-bold">Recruitment access.</span> Browse verified worker leads. Unlock full contact details with USDT credits.</p>
-      </div>
-      <form id="employerForm" class="mt-5 space-y-4" autocomplete="on">
-        <div><label class="label" for="companyName">Company Name *</label><input class="input" id="companyName" name="companyName" type="text" placeholder="e.g. Al Futtaim Recruitment LLC" autocomplete="organization" required></div>
-        
-        <div><label class="label" for="employerEmail">Email <span class="text-slate-600 normal-case font-medium">(optional)</span></label><input class="input" id="employerEmail" name="employerEmail" type="email" placeholder="office@company.com" autocomplete="email"></div>
-        
-        <div>
-          <label class="label" for="employerPhone">WhatsApp / Phone Number *</label>
-          <div class="flex gap-2">
-            <input class="input" id="employerPhone" name="employerPhone" type="tel" placeholder="+971 50 123 4567" autocomplete="tel" inputmode="tel" required>
-            <button type="button" id="tgPhoneBtnEmployer" class="shrink-0 px-3.5 rounded-xl bg-white/5 border border-white/10 text-gold active:scale-95 transition flex items-center justify-center" title="Use Telegram number">
-              <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.12 4.2 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.1 9.9a16 16 0 0 0 6 6l1.26-1.26a2 2 0 0 1 2.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92Z"/></svg>
-            </button>
-          </div>
-        </div>
-
-        <div><label class="label" for="officeAddress">City / Office Address <span class="text-slate-600 normal-case font-medium">(Optional)</span></label><input class="input" id="officeAddress" name="officeAddress" type="text" placeholder="e.g. Business Bay, Dubai"></div>
-        <div><label class="label" for="licenseNumber">Trade License No. <span class="text-slate-600 normal-case font-medium">(Optional - add later for verified badge)</span></label><input class="input" id="licenseNumber" name="licenseNumber" type="text" placeholder="e.g. DED-123456"></div>
-
-        <div>
-          <label class="label">Roles You Recruit For *</label>
-          <p class="text-[10px] text-slate-500 -mt-1 mb-2">Select all that apply.</p>
-          <div class="grid grid-cols-2 gap-2" id="employerJobs">
-            <label class="cursor-pointer"><input type="checkbox" name="employerJobs" value="Caregiver" class="peer sr-only"><div class="rounded-xl bg-white/5 border border-white/10 py-2.5 px-3 text-center text-[12px] font-bold text-slate-300 peer-checked:bg-gold peer-checked:text-navy peer-checked:border-gold transition">Caregiver</div></label>
-            <label class="cursor-pointer"><input type="checkbox" name="employerJobs" value="Driver" class="peer sr-only"><div class="rounded-xl bg-white/5 border border-white/10 py-2.5 px-3 text-center text-[12px] font-bold text-slate-300 peer-checked:bg-gold peer-checked:text-navy peer-checked:border-gold transition">Driver</div></label>
-            <label class="cursor-pointer"><input type="checkbox" name="employerJobs" value="Security" class="peer sr-only"><div class="rounded-xl bg-white/5 border border-white/10 py-2.5 px-3 text-center text-[12px] font-bold text-slate-300 peer-checked:bg-gold peer-checked:text-navy peer-checked:border-gold transition">Security</div></label>
-            <label class="cursor-pointer"><input type="checkbox" name="employerJobs" value="Factory" class="peer sr-only"><div class="rounded-xl bg-white/5 border border-white/10 py-2.5 px-3 text-center text-[12px] font-bold text-slate-300 peer-checked:bg-gold peer-checked:text-navy peer-checked:border-gold transition">Factory</div></label>
-            <label class="cursor-pointer"><input type="checkbox" name="employerJobs" value="Warehouse" class="peer sr-only"><div class="rounded-xl bg-white/5 border border-white/10 py-2.5 px-3 text-center text-[12px] font-bold text-slate-300 peer-checked:bg-gold peer-checked:text-navy peer-checked:border-gold transition">Warehouse</div></label>
-            <label class="cursor-pointer"><input type="checkbox" name="employerJobs" value="Electrician" class="peer sr-only"><div class="rounded-xl bg-white/5 border border-white/10 py-2.5 px-3 text-center text-[12px] font-bold text-slate-300 peer-checked:bg-gold peer-checked:text-navy peer-checked:border-gold transition">Electrician</div></label>
-            <label class="cursor-pointer"><input type="checkbox" name="employerJobs" value="Plumber" class="peer sr-only"><div class="rounded-xl bg-white/5 border border-white/10 py-2.5 px-3 text-center text-[12px] font-bold text-slate-300 peer-checked:bg-gold peer-checked:text-navy peer-checked:border-gold transition">Plumber</div></label>
-            <label class="cursor-pointer"><input type="checkbox" name="employerJobs" value="Cleaner" class="peer sr-only"><div class="rounded-xl bg-white/5 border border-white/10 py-2.5 px-3 text-center text-[12px] font-bold text-slate-300 peer-checked:bg-gold peer-checked:text-navy peer-checked:border-gold transition">Cleaner</div></label>
-          </div>
-        </div>
-        <div id="employerError" class="hidden rounded-xl bg-red-500/10 border border-red-500/30 px-4 py-3"><p class="text-[11.5px] text-red-300 font-medium leading-relaxed" id="employerErrorText"></p></div>
-        <button id="employerSubmitBtn" type="submit" class="w-full rounded-2xl bg-gold text-navy font-extrabold text-[15px] py-4 shadow-xl shadow-gold/25 active:scale-[0.98] transition flex items-center justify-center gap-2.5 disabled:opacity-70 disabled:active:scale-100">
-          <span id="employerSpinner" class="spinner hidden"></span><span id="employerBtnText">Create Account & Get 1 Free Lead</span>
-        </button>
-        <p class="text-center text-[10px] text-slate-500 pb-2">We use these details to send you payment receipts and lead invoices.</p>
+  <!-- RECRUITER VIEWS -->
+  <section id="view-recruiter-reg" class="view hidden">
+    <div class="max-w-md mx-auto px-5 pt-8 safe-bottom">
+      <button onclick="showView('view-role')" class="mb-4 text-slate-400 text-sm">← Back</button>
+      <h2 class="text-xl font-extrabold mb-4">Recruiter Registration</h2>
+      <form id="recruiterForm" class="space-y-4">
+        <input class="input" name="company_name" placeholder="Company Name" required>
+        <input class="input" name="email" type="email" placeholder="Email">
+        <input class="input" name="phone" type="tel" placeholder="WhatsApp Number" required>
+        <input class="input" name="office_address" placeholder="City / Office Address (Optional)">
+        <input class="input" name="license_number" placeholder="Trade License No. (Optional)">
+        <button type="submit" class="btn">Create Account</button>
       </form>
     </div>
   </section>
 
-  <!-- VIEW 6 — EMPLOYER DASHBOARD -->
-  <section id="view-employer-dash" class="view hidden">
-    <header class="sticky top-0 z-30 bg-navy/85 backdrop-blur-xl border-b border-white/10">
-      <div class="max-w-md mx-auto px-5 py-3 flex items-center justify-between gap-3">
-        <div class="flex items-center gap-2.5 min-w-0">
-          <div class="w-9 h-9 rounded-xl bg-gold flex items-center justify-center text-navy font-black text-lg shadow-lg shadow-gold/20 shrink-0">W</div>
-          <div class="leading-tight min-w-0">
-            <p class="font-extrabold tracking-tight text-[14px] truncate" id="dashCompany">Recruitment</p>
-            <p class="text-[9px] text-gold font-bold tracking-[0.16em] uppercase">Employer Panel</p>
-          </div>
-        </div>
-        <button type="button" data-switch-role class="text-[10px] font-extrabold px-2.5 py-1.5 rounded-full bg-white/5 border border-white/10 text-slate-300 active:scale-95 transition shrink-0">Switch</button>
-      </div>
+  <section id="view-recruiter-dash" class="view hidden">
+    <header class="sticky top-0 z-30 bg-navy/90 border-b border-white/10 p-4 flex justify-between items-center">
+      <h1 class="font-extrabold text-[15px]">Recruiter Dashboard</h1>
+      <button onclick="showView('view-role')" class="text-xs bg-white/10 px-3 py-1 rounded">Switch</button>
     </header>
-    <div class="max-w-md mx-auto px-5 pt-5 safe-bottom">
-      
-      <!-- Verification Banner -->
-      <div id="verificationBanner" class="card p-3 mb-4 border-gold/30 bg-gold/[0.05] hidden">
-        <div class="flex items-center justify-between gap-3">
-          <div>
-            <p class="text-[12px] font-extrabold text-gold">Get Verified Badge</p>
-            <p class="text-[10px] text-slate-400 mt-0.5">Upload Trade License for priority support.</p>
-          </div>
-          <button type="button" onclick="openVerifyModal()" class="text-[10px] font-extrabold bg-gold text-navy px-3 py-1.5 rounded-lg shrink-0 active:scale-95 transition">Add License</button>
-        </div>
+    <div class="max-w-md mx-auto px-4 py-5 pb-24">
+      <div class="flex gap-2 mb-4">
+        <input type="text" id="searchJob" placeholder="Search Job..." class="input text-xs" onkeyup="loadRecruiterLeads()">
+        <input type="text" id="searchQual" placeholder="Qualification..." class="input text-xs" onkeyup="loadRecruiterLeads()">
       </div>
-
-      <div class="grid grid-cols-2 gap-3">
-        <div class="card p-4"><p class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Credits</p><p class="mt-1 text-[26px] font-extrabold text-gold leading-none" id="dashCredits">0</p><p class="text-[10px] text-slate-500 mt-1">1 credit = 1 unlock</p></div>
-        <div class="card p-4"><p class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Available Leads</p><p class="mt-1 text-[26px] font-extrabold text-white leading-none" id="dashCount">—</p><p class="text-[10px] text-slate-500 mt-1">Verified workers</p></div>
+      <div id="recruiterLeadsList" class="space-y-3"></div>
+    </div>
+    <div id="cartBanner" class="fixed bottom-0 inset-x-0 p-4 bg-navysoft border-t border-white/10 hidden z-40">
+      <div class="max-w-md mx-auto flex items-center justify-between">
+        <div><p class="text-xs text-slate-400">Selected</p><p class="font-extrabold text-gold" id="cartTotal">0 Leads</p></div>
+        <button onclick="checkoutCart()" class="bg-gold text-navy font-extrabold px-6 py-2.5 rounded-xl text-sm">Checkout</button>
       </div>
-      <button type="button" id="buyCreditsBtn" class="mt-3 w-full rounded-2xl bg-gold text-navy font-extrabold text-[13.5px] py-3.5 shadow-lg shadow-gold/20 active:scale-[0.98] transition">Buy Unlock Credits (USDT)</button>
-      <div id="hiringFocus" class="mt-3 card p-3 hidden">
-        <p class="text-[9px] font-bold uppercase tracking-wider text-slate-500">Your Hiring Focus</p>
-        <div id="hiringFocusChips" class="flex flex-wrap gap-1.5 mt-2"></div>
-      </div>
-      <div class="mt-6 flex items-center justify-between mb-3">
-        <h2 class="text-sm font-extrabold tracking-tight">Lead Preview</h2>
-        <span class="text-[10.5px] font-semibold text-gold">Masked · Pay to unlock</span>
-      </div>
-      <div id="leadsList" class="space-y-2.5"></div>
-      <p class="text-center text-[10px] text-slate-500 mt-6 pb-2 leading-relaxed">Contact details are masked until unlocked.<br>Payment is in USDT (TRC20). Credits never expire.</p>
     </div>
   </section>
 
-</div>
-
-<!-- USDT MODAL -->
-<div id="usdtModal" class="fixed inset-0 z-50 hidden">
-  <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" data-close-modal></div>
-  <div class="absolute inset-x-0 bottom-0">
-    <div class="max-w-md mx-auto bg-navysoft border-t border-white/10 rounded-t-3xl p-6 safe-bottom fade-in">
-      <div class="w-10 h-1 rounded-full bg-white/20 mx-auto mb-5"></div>
-
-      <div id="stepPackages">
-        <div class="flex items-center gap-3">
-          <div class="w-11 h-11 rounded-xl bg-gold/15 border border-gold/25 flex items-center justify-center shrink-0 text-gold text-xl font-black">$</div>
-          <div><p class="font-extrabold text-[15px]">Buy Unlock Credits</p><p class="text-[11px] text-slate-400">Choose a package</p></div>
-        </div>
-        <div class="mt-4 space-y-2" id="packageList"></div>
-        <button type="button" data-close-modal class="mt-4 w-full rounded-2xl bg-white/5 border border-white/10 text-slate-300 font-bold text-[13px] py-3">Cancel</button>
+  <section id="view-checkout" class="view hidden">
+    <div class="max-w-md mx-auto px-5 py-8 text-center">
+      <h2 class="text-xl font-extrabold mb-2">Payment Required</h2>
+      <p class="text-slate-400 text-sm mb-6">Send the exact USDT amount below.</p>
+      <div class="card p-6 mb-6">
+        <p class="text-3xl font-extrabold text-gold mb-1" id="checkoutAmount">0 USDT</p>
+        <p class="text-xs text-slate-500 mb-4">TRC-20 Network</p>
+        <div class="bg-white p-2 w-fit mx-auto rounded-lg mb-4"><img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=TNdv8vkaNdWYHPrHYuwuzjW6ivhHynr4vZ" width="150" height="150"></div>
+        <p class="text-xs text-slate-400 mb-1">Wallet Address</p>
+        <p class="text-[10px] font-mono text-white break-all bg-white/5 p-2 rounded">TNdv8vkaNdWYHPrHYuwuzjW6ivhHynr4vZ</p>
       </div>
-
-      <div id="stepPayment" class="hidden">
-        <div class="flex items-center gap-3">
-          <div class="w-11 h-11 rounded-xl bg-gold/15 border border-gold/25 flex items-center justify-center shrink-0 text-gold text-xl font-black">₮</div>
-          <div><p class="font-extrabold text-[15px]">Send USDT</p><p class="text-[11px] text-slate-400">TRC-20 network only</p></div>
-        </div>
-        <div class="mt-4 rounded-xl bg-white p-2 w-fit mx-auto">
-          <img id="qrImg" width="160" height="160" alt="QR">
-        </div>
-        <div class="mt-3 space-y-2">
-          <div class="rounded-xl bg-white/5 border border-white/10 p-3">
-            <p class="text-[9px] font-bold uppercase tracking-wider text-slate-500">Amount (exact)</p>
-            <div class="flex items-center gap-2 mt-1">
-              <p id="payAmount" class="text-[16px] font-extrabold text-gold flex-1">—</p>
-              <button id="copyAmount" class="text-[10px] font-bold px-2 py-1 rounded-lg bg-gold/15 text-gold">Copy</button>
-            </div>
-          </div>
-          <div class="rounded-xl bg-white/5 border border-white/10 p-3">
-            <p class="text-[9px] font-bold uppercase tracking-wider text-slate-500">Address (TRC-20)</p>
-            <div class="flex items-center gap-2 mt-1">
-              <p id="payAddress" class="text-[10.5px] font-mono text-slate-300 flex-1 break-all">—</p>
-              <button id="copyAddress" class="text-[10px] font-bold px-2 py-1 rounded-lg bg-gold/15 text-gold shrink-0">Copy</button>
-            </div>
-          </div>
-          <div class="rounded-xl bg-white/5 border border-white/10 p-3">
-            <p class="text-[9px] font-bold uppercase tracking-wider text-slate-500">Reference</p>
-            <p id="payRef" class="text-[14px] font-extrabold text-white mt-1 font-mono">—</p>
-          </div>
-        </div>
-        <p class="mt-3 text-[10.5px] text-slate-400 leading-relaxed">Send <span class="text-gold font-bold">the exact amount</span> shown. Then tap below.</p>
-        <button id="sentBtn" type="button" class="mt-4 w-full rounded-2xl bg-gold text-navy font-extrabold text-[14px] py-3.5 shadow-lg shadow-gold/20">I've Sent the Payment</button>
-        <button type="button" id="backToPackages" class="mt-2 w-full rounded-2xl bg-white/5 border border-white/10 text-slate-300 font-bold text-[13px] py-3">Back</button>
-      </div>
-
-      <div id="stepClaimed" class="hidden text-center py-2">
-        <div class="w-16 h-16 mx-auto rounded-full bg-gold/15 border border-gold/30 flex items-center justify-center text-gold text-2xl">⏳</div>
-        <p class="mt-4 font-extrabold text-[15px]">Payment Under Review</p>
-        <p class="mt-2 text-[11.5px] text-slate-400 leading-relaxed">Our team is verifying your payment. Credits appear in 10–30 minutes.</p>
-        <button type="button" data-close-modal class="mt-5 w-full rounded-2xl bg-gold text-navy font-extrabold text-[14px] py-3.5">Done</button>
-      </div>
-
+      <button onclick="claimPayment()" class="btn">I've Sent the Payment</button>
     </div>
-  </div>
-</div>
+  </section>
 
-<!-- SCHEDULE INTERVIEW MODAL -->
-<div id="interviewModal" class="fixed inset-0 z-50 hidden">
-  <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" data-close-int-modal></div>
-  <div class="absolute inset-x-0 bottom-0">
-    <div class="max-w-md mx-auto bg-navysoft border-t border-white/10 rounded-t-3xl p-6 safe-bottom fade-in">
-      <div class="w-10 h-1 rounded-full bg-white/20 mx-auto mb-5"></div>
-      <div class="flex items-center gap-3">
-        <div class="w-11 h-11 rounded-xl bg-gold/15 border border-gold/25 flex items-center justify-center shrink-0 text-gold text-xl font-black">📅</div>
-        <div><p class="font-extrabold text-[15px]">Schedule Interview</p><p class="text-[11px] text-slate-400">Send an invitation to this worker</p></div>
-      </div>
-      <div class="mt-4 space-y-3">
-        <div>
-          <label class="label" for="intDate">Interview Date & Time *</label>
-          <input type="datetime-local" id="intDate" class="input" required>
-        </div>
-        <div>
-          <label class="label" for="intMessage">Message (Optional)</label>
-          <input type="text" id="intMessage" class="input" placeholder="e.g. Please bring your original passport">
-        </div>
-      </div>
-      <button type="button" id="sendInterviewBtn" class="mt-5 w-full rounded-2xl bg-gold text-navy font-extrabold text-[14px] py-3.5 shadow-lg shadow-gold/20">Send Invitation (Free)</button>
-      <button type="button" data-close-int-modal class="mt-2 w-full rounded-2xl bg-white/5 border border-white/10 text-slate-300 font-bold text-[13px] py-3">Cancel</button>
+  <!-- AGENT VIEWS -->
+  <section id="view-agent-reg" class="view hidden">
+    <div class="max-w-md mx-auto px-5 pt-8 safe-bottom">
+      <button onclick="showView('view-role')" class="mb-4 text-slate-400 text-sm">← Back</button>
+      <h2 class="text-xl font-extrabold mb-4">Agent Registration</h2>
+      <form id="agentRegForm" class="space-y-4">
+        <input class="input" name="name" placeholder="Full Name" required>
+        <input class="input" name="email" type="email" placeholder="Email">
+        <input class="input" name="phone" type="tel" placeholder="WhatsApp Number" required>
+        <input class="input" name="address" placeholder="Address">
+        <select class="input text-white bg-navy" name="candidate_pool">
+          <option value="0-10">0 - 10 Candidates</option>
+          <option value="10-20">10 - 20 Candidates</option>
+          <option value="20+">20+ Candidates</option>
+        </select>
+        <button type="submit" class="btn">Register as Agent</button>
+      </form>
     </div>
-  </div>
-</div>
+  </section>
 
-<!-- VERIFY LICENSE MODAL -->
-<div id="verifyModal" class="fixed inset-0 z-50 hidden">
-  <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" data-close-verify-modal></div>
-  <div class="absolute inset-x-0 bottom-0">
-    <div class="max-w-md mx-auto bg-navysoft border-t border-white/10 rounded-t-3xl p-6 safe-bottom fade-in">
-      <div class="w-10 h-1 rounded-full bg-white/20 mx-auto mb-5"></div>
-      <div class="flex items-center gap-3">
-        <div class="w-11 h-11 rounded-xl bg-gold/15 border border-gold/25 flex items-center justify-center shrink-0 text-gold text-xl font-black">🛡️</div>
-        <div><p class="font-extrabold text-[15px]">Get Verified</p><p class="text-[11px] text-slate-400">Add Trade License for priority support</p></div>
+  <section id="view-agent-dash" class="view hidden">
+    <header class="sticky top-0 z-30 bg-navy/90 border-b border-white/10 p-4 flex justify-between items-center">
+      <div><h1 class="font-extrabold text-[15px]">Agent Dashboard</h1><p class="text-[10px] text-gold font-bold">Earnings: $<span id="agentEarnings">0</span></p></div>
+      <button onclick="showView('view-role')" class="text-xs bg-white/10 px-3 py-1 rounded">Switch</button>
+    </header>
+    <div class="max-w-md mx-auto px-4 py-5">
+      <div class="flex gap-2 mb-4">
+        <button onclick="showView('view-agent-add')" class="flex-1 bg-gold text-navy font-extrabold py-2 rounded-xl text-xs">+ Add Candidate</button>
+        <button onclick="showView('view-agent-profile')" class="flex-1 bg-white/10 text-white font-extrabold py-2 rounded-xl text-xs">Payout Profile</button>
       </div>
-      <div class="mt-4 space-y-3">
-        <div>
-          <label class="label" for="verifyAddress">City / Office Address</label>
-          <input type="text" id="verifyAddress" class="input" placeholder="e.g. Business Bay, Dubai">
-        </div>
-        <div>
-          <label class="label" for="verifyLicense">Trade License Number *</label>
-          <input type="text" id="verifyLicense" class="input" placeholder="e.g. DED-123456">
-        </div>
-      </div>
-      <button type="button" id="saveVerifyBtn" class="mt-5 w-full rounded-2xl bg-gold text-navy font-extrabold text-[14px] py-3.5 shadow-lg shadow-gold/20">Save & Verify</button>
-      <button type="button" data-close-verify-modal class="mt-2 w-full rounded-2xl bg-white/5 border border-white/10 text-slate-300 font-bold text-[13px] py-3">Cancel</button>
+      <div id="agentLeadsList" class="space-y-2"></div>
     </div>
+  </section>
+
+  <section id="view-agent-add" class="view hidden">
+    <div class="max-w-md mx-auto px-5 pt-8 safe-bottom">
+      <button onclick="showView('view-agent-dash')" class="mb-4 text-slate-400 text-sm">← Back</button>
+      <h2 class="text-xl font-extrabold mb-4">Add Candidate</h2>
+      <form id="agentAddForm" class="space-y-4">
+        <input class="input" name="name" placeholder="Candidate Full Name" required>
+        <input class="input" name="phone" type="tel" placeholder="Candidate WhatsApp Number" required>
+        <input class="input" name="email" type="email" placeholder="Candidate Email">
+        <select class="input text-white bg-navy" name="job" required><option value="">Job...</option><option>Caregiver</option><option>Driver</option><option>Security</option><option>Factory</option><option>Warehouse</option></select>
+        <select class="input text-white bg-navy" name="qualification" required><option value="">Qualification...</option><option>SSCE</option><option>OND</option><option>HND/BSc</option></select>
+        <select class="input text-white bg-navy" name="experience" required><option value="">Experience...</option><option>None</option><option>1-2 Years</option><option>3-5 Years</option></select>
+        <input class="input" name="cv" placeholder="CV Link">
+        <button type="submit" class="btn">Add Candidate</button>
+      </form>
+    </div>
+  </section>
+
+  <section id="view-agent-profile" class="view hidden">
+    <div class="max-w-md mx-auto px-5 pt-8 safe-bottom">
+      <button onclick="showView('view-agent-dash')" class="mb-4 text-slate-400 text-sm">← Back</button>
+      <h2 class="text-xl font-extrabold mb-4">Payout Details</h2>
+      <form id="agentProfileForm" class="space-y-4">
+        <input class="input" name="bank_name" placeholder="Bank Name">
+        <input class="input" name="account_number" placeholder="Account Number">
+        <input class="input" name="account_name" placeholder="Account Name">
+        <input class="input" name="wallet_address" placeholder="USDT Wallet Address (TRC-20)">
+        <button type="submit" class="btn">Save Details</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- SOURCER VIEWS -->
+  <section id="view-sourcer-reg" class="view hidden">
+    <div class="max-w-md mx-auto px-5 pt-8 safe-bottom">
+      <button onclick="showView('view-role')" class="mb-4 text-slate-400 text-sm">← Back</button>
+      <h2 class="text-xl font-extrabold mb-4">Sourcer Registration</h2>
+      <form id="sourcerRegForm" class="space-y-4">
+        <input class="input" name="name" placeholder="Full Name" required>
+        <input class="input" name="email" type="email" placeholder="Email">
+        <input class="input" name="phone" type="tel" placeholder="WhatsApp Number" required>
+        <input class="input" name="address" placeholder="Address">
+        <select class="input text-white bg-navy" name="traffic_source">
+          <option value="Facebook">Facebook</option>
+          <option value="WhatsApp">WhatsApp</option>
+          <option value="Telegram">Telegram</option>
+          <option value="Other">Other</option>
+        </select>
+        <button type="submit" class="btn">Get Referral Link</button>
+      </form>
+    </div>
+  </section>
+
+  <section id="view-sourcer-dash" class="view hidden">
+    <header class="sticky top-0 z-30 bg-navy/90 border-b border-white/10 p-4 flex justify-between items-center">
+      <div><h1 class="font-extrabold text-[15px]">Sourcer Dashboard</h1><p class="text-[10px] text-emerald-400 font-bold">Earnings: $<span id="sourcerEarnings">0</span></p></div>
+      <button onclick="showView('view-role')" class="text-xs bg-white/10 px-3 py-1 rounded">Switch</button>
+    </header>
+    <div class="max-w-md mx-auto px-4 py-5">
+      <div class="card p-4 text-center mb-4">
+        <p class="text-xs text-slate-400 mb-1">Your Referral Link</p>
+        <p class="text-sm font-mono text-gold break-all bg-white/5 p-2 rounded" id="refLink">...</p>
+      </div>
+      <div class="flex gap-2 mb-4">
+        <button onclick="showView('view-sourcer-profile')" class="w-full bg-white/10 text-white font-extrabold py-2 rounded-xl text-xs">Payout Profile</button>
+      </div>
+      <div id="sourcerLeadsList" class="space-y-2"></div>
+    </div>
+  </section>
+
+  <section id="view-sourcer-profile" class="view hidden">
+    <div class="max-w-md mx-auto px-5 pt-8 safe-bottom">
+      <button onclick="showView('view-sourcer-dash')" class="mb-4 text-slate-400 text-sm">← Back</button>
+      <h2 class="text-xl font-extrabold mb-4">Payout Details</h2>
+      <form id="sourcerProfileForm" class="space-y-4">
+        <input class="input" name="bank_name" placeholder="Bank Name">
+        <input class="input" name="account_number" placeholder="Account Number">
+        <input class="input" name="account_name" placeholder="Account Name">
+        <input class="input" name="wallet_address" placeholder="USDT Wallet Address (TRC-20)">
+        <button type="submit" class="btn">Save Details</button>
+      </form>
+    </div>
+  </section>
+
+  <div id="loadingOverlay" class="fixed inset-0 bg-navy/90 z-50 hidden flex items-center justify-center flex-col">
+    <div class="spinner mb-4"></div><p class="font-bold text-gold">Processing...</p>
   </div>
+
 </div>
 
 <script>
-  /* ============ CONFIG ============ */
   const SUPABASE_URL = "https://fnpccciwbwrragpnzyqc.supabase.co";
   const SUPABASE_KEY = "sb_publishable_i1BSTJbZ1nWkMzxJ0NZj-g_mMRA6wvZ";
-  const ACCOUNTS_HANDLE = "WorldBridgeDesk";
-  const USDT_ADDRESS = "TNdv8vkaNdWYHPrHYuwuzjW6ivhHynr4vZ";
+  const tg = window.Telegram?.WebApp;
+  const TG_ID = tg?.initDataUnsafe?.user?.id || 123456789;
+  let cart = [];
+  let currentOrderRef = '';
 
-  const PACKAGES = [
-    { id: 'p5',  credits: 5,  price: 80,  label: 'Starter',  desc: '5 worker contacts' },
-    { id: 'p10', credits: 10, price: 150, label: 'Standard', desc: '10 worker contacts' },
-    { id: 'p25', credits: 25, price: 350, label: 'Pro',      desc: '25 worker contacts' }
-  ];
-  let currentOrder = null;
-  let currentWorkerId = null; // For scheduling interviews
+  if(tg) { tg.ready(); tg.expand(); }
 
-  /* ============ TELEGRAM ============ */
-  const tg = (window.Telegram && window.Telegram.WebApp) ? window.Telegram.WebApp : null;
-  if (tg) {
-    try { tg.ready(); } catch (e) {}
-    try { tg.expand(); } catch (e) {}
-    try { tg.setHeaderColor('#0F172A'); } catch (e) {}
-    try { tg.setBackgroundColor('#0F172A'); } catch (e) {}
-    try { tg.disableVerticalSwipes && tg.disableVerticalSwipes(); } catch (e) {}
-  }
-  const TG_USER_ID = (tg && tg.initDataUnsafe && tg.initDataUnsafe.user && tg.initDataUnsafe.user.id) ? tg.initDataUnsafe.user.id : null;
-
-  /* ============ VIEWS ============ */
-  const VIEWS = ['view-role','view-welcome','view-form','view-success','view-worker-dash','view-employer-reg','view-employer-dash'];
   function showView(id) {
-    VIEWS.forEach(function (v) {
-      const el = document.getElementById(v);
-      if (!el) return;
-      el.classList.toggle('hidden', v !== id);
-      if (v === id) { el.classList.remove('fade-in'); void el.offsetWidth; el.classList.add('fade-in'); }
+    document.querySelectorAll('.view').forEach(el => el.classList.add('hidden'));
+    document.getElementById(id).classList.remove('hidden');
+    window.scrollTo(0,0);
+  }
+  function loading(show) { document.getElementById('loadingOverlay').classList.toggle('hidden', !show); }
+
+  function selectRole(role) {
+    if (role === 'worker') showView('view-worker-reg');
+    if (role === 'recruiter') showView('view-recruiter-reg');
+    if (role === 'agent') showView('view-agent-reg');
+    if (role === 'sourcer') showView('view-sourcer-reg');
+  }
+
+  // --- WORKER LOGIC ---
+  document.getElementById('workerForm').addEventListener('submit', async (e) => {
+    e.preventDefault(); loading(true);
+    const data = Object.fromEntries(new FormData(e.target).entries());
+    data.added_by_role = 'worker'; data.telegram_id = TG_ID;
+    await fetch(`${SUPABASE_URL}/rest/v1/gulf_leads`, {
+      method: 'POST', headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' }, body: JSON.stringify(data)
     });
-    window.scrollTo(0, 0);
-    if (tg && tg.BackButton) {
-      try {
-        if (id === 'view-role' || id === 'view-welcome' || id === 'view-success' || id === 'view-worker-dash' || id === 'view-employer-dash') tg.BackButton.hide();
-        else tg.BackButton.show();
-      } catch (e) {}
-    }
-    if (id === 'view-employer-dash') { hydrateDashboardHeader(); loadLeads(); }
-    if (id === 'view-worker-dash') { loadWorkerDashboard(); }
-  }
-
-  /* ============ ELEMENTS ============ */
-  const form = document.getElementById('leadForm');
-  const startBtn = document.getElementById('startBtn');
-  const backBtns = document.querySelectorAll('[data-back]');
-  const startBtns = document.querySelectorAll('[data-start]');
-  const switchBtns = document.querySelectorAll('[data-switch-role]');
-  const closeBtn = document.getElementById('closeBtn');
-  const phoneInput = document.getElementById('phone');
-  const tgPhoneBtn = document.getElementById('tgPhoneBtn');
-  const passportWrap = document.getElementById('passportWrap');
-  const passportLast4 = document.getElementById('passportLast4');
-  const submitBtn = document.getElementById('submitBtn');
-  const btnSpinner = document.getElementById('btnSpinner');
-  const btnText = document.getElementById('btnText');
-  const formError = document.getElementById('formError');
-  const formErrorText = document.getElementById('formErrorText');
-  const roleWorker = document.getElementById('roleWorker');
-  const roleEmployer = document.getElementById('roleEmployer');
-  const backRoleBtns = document.querySelectorAll('[data-back-role]');
-  const employerForm = document.getElementById('employerForm');
-  const empPhoneInput = document.getElementById('employerPhone');
-  const tgPhoneEmp = document.getElementById('tgPhoneBtnEmployer');
-  const empSubmitBtn = document.getElementById('employerSubmitBtn');
-  const empSpinner = document.getElementById('employerSpinner');
-  const empBtnText = document.getElementById('employerBtnText');
-  const empError = document.getElementById('employerError');
-  const empErrorText = document.getElementById('employerErrorText');
-  const leadsList = document.getElementById('leadsList');
-  const dashCompany = document.getElementById('dashCompany');
-  const dashCredits = document.getElementById('dashCredits');
-  const dashCount = document.getElementById('dashCount');
-  const modalCredits = document.getElementById('modalCredits');
-  const usdtModal = document.getElementById('usdtModal');
-  const buyCreditsBtn = document.getElementById('buyCreditsBtn');
-  const hiringFocus = document.getElementById('hiringFocus');
-  const hiringChips = document.getElementById('hiringFocusChips');
-  const verificationBanner = document.getElementById('verificationBanner');
-  
-  // Worker Dashboard Elements
-  const workerInitial = document.getElementById('workerInitial');
-  const workerName = document.getElementById('workerName');
-  const workerJob = document.getElementById('workerJob');
-  const workerStatus = document.getElementById('workerStatus');
-  const updateCvLink = document.getElementById('updateCvLink');
-  const updateCvBtn = document.getElementById('updateCvBtn');
-  const cvStatus = document.getElementById('cvStatus');
-  const interviewsList = document.getElementById('interviewsList');
-
-  // Interview Modal Elements
-  const interviewModal = document.getElementById('interviewModal');
-  const intDate = document.getElementById('intDate');
-  const intMessage = document.getElementById('intMessage');
-  const sendInterviewBtn = document.getElementById('sendInterviewBtn');
-
-  // Verify Modal Elements
-  const verifyModal = document.getElementById('verifyModal');
-  const verifyAddress = document.getElementById('verifyAddress');
-  const verifyLicense = document.getElementById('verifyLicense');
-  const saveVerifyBtn = document.getElementById('saveVerifyBtn');
-
-  /* ============ STORAGE ============ */
-  function safeGet(k){try{return localStorage.getItem(k);}catch(e){return null;}}
-  function safeSet(k,v){try{localStorage.setItem(k,v);}catch(e){}}
-  function safeGetJSON(k){try{const r=localStorage.getItem(k);return r?JSON.parse(r):null;}catch(e){return null;}}
-  function safeSetJSON(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
-
-  /* ============ ROLE & INIT ============ */
-  roleWorker.addEventListener('click', async function(){ 
-    safeSet('wb_role','worker'); 
-    if (TG_USER_ID) {
-      try {
-        const res = await fetch(SUPABASE_URL + '/rest/v1/rpc/get_worker_profile', {
-          method: 'POST',
-          headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY, 'Content-Type': 'application/json' },
-          body: JSON.stringify({ tg_id: TG_USER_ID })
-        });
-        const profiles = await res.json();
-        if (profiles && profiles.length > 0) {
-          showView('view-worker-dash');
-          return;
-        }
-      } catch(e) { console.error(e); }
-    }
-    showView('view-welcome'); 
+    loading(false); alert("Application submitted!"); showView('view-worker-dash');
   });
 
-  roleEmployer.addEventListener('click', function(){
-    safeSet('wb_role','employer');
-    if (safeGet('wb_employer_name')) showView('view-employer-dash');
-    else showView('view-employer-reg');
-  });
-  
-  backRoleBtns.forEach(b => b.addEventListener('click', () => showView('view-role')));
-  switchBtns.forEach(b => b.addEventListener('click', function(){
-    try{localStorage.removeItem('wb_role');}catch(e){}
-    showView('view-role');
-  }));
-
-  /* ============ NAV ============ */
-  startBtn.addEventListener('click', () => showView('view-form'));
-  startBtns.forEach(b => b.addEventListener('click', () => showView('view-form')));
-  backBtns.forEach(b => b.addEventListener('click', () => showView('view-welcome')));
-  closeBtn.addEventListener('click', function(){
-    if (tg && typeof tg.close === 'function') { try { tg.close(); return; } catch(e){} }
-    showView('view-role');
-  });
-  
-  if (tg && tg.BackButton) {
-    try {
-      tg.BackButton.onClick(function(){
-        const visible = VIEWS.find(v => { const el = document.getElementById(v); return el && !el.classList.contains('hidden'); });
-        if (visible === 'view-form') showView('view-welcome');
-        else if (visible === 'view-employer-reg') showView('view-role');
-        else showView('view-role');
-      });
-    } catch(e){}
-  }
-
-  /* ============ PHONE BUTTONS ============ */
-  function bindPhoneButton(btn, input){
-    btn.addEventListener('click', function(){
-      if (tg && typeof tg.requestContact === 'function') {
-        try {
-          tg.requestContact(function(shared, contact){
-            if (shared && contact && contact.phone_number) input.value = contact.phone_number;
-            else input.focus();
-          });
-          return;
-        } catch(e){}
-      }
-      const u = tg && tg.initDataUnsafe && tg.initDataUnsafe.user;
-      if (u && u.phone_number) input.value = u.phone_number;
-      else input.focus();
+  async function updateWorkerCv() {
+    const cv = document.getElementById('workerCvUpdate').value;
+    await fetch(`${SUPABASE_URL}/rest/v1/gulf_leads?telegram_id=eq.${TG_ID}`, {
+      method: 'PATCH', headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ cv })
     });
+    alert("CV Updated!");
   }
-  bindPhoneButton(tgPhoneBtn, phoneInput);
-  bindPhoneButton(tgPhoneEmp, empPhoneInput);
 
-  /* ============ PASSPORT TOGGLE ============ */
-  document.querySelectorAll('input[name="passport"]').forEach(function(radio){
-    radio.addEventListener('change', function(){
-      const hasPassport = document.querySelector('input[name="passport"]:checked')?.value === 'Yes';
-      passportWrap.classList.toggle('hidden', !hasPassport);
-      passportLast4.required = hasPassport;
-      if (!hasPassport) passportLast4.value = '';
+  // --- RECRUITER LOGIC ---
+  document.getElementById('recruiterForm').addEventListener('submit', async (e) => {
+    e.preventDefault(); loading(true);
+    const data = Object.fromEntries(new FormData(e.target).entries());
+    data.telegram_id = TG_ID;
+    await fetch(`${SUPABASE_URL}/rest/v1/recruiters`, {
+      method: 'POST', headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' }, body: JSON.stringify(data)
     });
+    loading(false); showView('view-recruiter-dash'); loadRecruiterLeads();
   });
 
-  /* ============ HELPERS ============ */
-  function setLoading(btn, spinner, label, state, idle, busy) {
-    btn.disabled = state;
-    spinner.classList.toggle('hidden', !state);
-    label.textContent = state ? busy : idle;
-  }
-  function showBox(box, textEl, msg){ textEl.textContent = msg; box.classList.remove('hidden'); box.scrollIntoView({behavior:'smooth',block:'center'}); }
-  function hideBox(box){ box.classList.add('hidden'); }
-  function val(fd, key){ const v = fd.get(key); if (v == null) return null; const s = String(v).trim(); return s === '' ? null : s; }
-
-  /* ============ WORKER SUBMIT ============ */
-  form.addEventListener('submit', async function(e){
-    e.preventDefault();
-    hideBox(formError);
-    if (!form.checkValidity()) { form.reportValidity(); return; }
-    const fd = new FormData(form);
-    const hasPassport = val(fd,'passport') === 'Yes';
-    const payload = {
-      name: val(fd,'name'), phone: val(fd,'phone'), email: val(fd,'email'),
-      location: val(fd,'location'), job: val(fd,'job'),
-      qualification: val(fd,'qualification'), experience: val(fd,'experience'),
-      passport: hasPassport, passport_last4: hasPassport ? val(fd,'passportLast4') : null,
-      ready: val(fd,'ready'), cv: val(fd,'cv'),
-      telegram_id: TG_USER_ID, status: 'active'
-    };
-    setLoading(submitBtn, btnSpinner, btnText, true, 'Submit Application', 'Submitting…');
-    try {
-      const res = await fetch(SUPABASE_URL + '/rest/v1/gulf_leads', {
-        method: 'POST',
-        headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
-        body: JSON.stringify(payload)
-      });
-      if (!res.ok) throw new Error(await res.text());
-      form.reset();
-      passportWrap.classList.add('hidden');
-      passportLast4.required = false;
-      setLoading(submitBtn, btnSpinner, btnText, false, 'Submit Application', 'Submitting…');
-      showView('view-success');
-    } catch(err) {
-      setLoading(submitBtn, btnSpinner, btnText, false, 'Submit Application', 'Submitting…');
-      showBox(formError, formErrorText, 'Could not submit your application. Please check your connection and try again.');
-      console.error('[WorldBridge] worker submit error:', err);
-    }
-  });
-
-  /* ============ WORKER DASHBOARD ============ */
-  async function loadWorkerDashboard() {
-    if (!TG_USER_ID) return;
-    try {
-      const res = await fetch(SUPABASE_URL + '/rest/v1/rpc/get_worker_profile', {
-        method: 'POST',
-        headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ tg_id: TG_USER_ID })
-      });
-      const profiles = await res.json();
-      if (profiles && profiles.length > 0) {
-        const p = profiles[0];
-        workerInitial.textContent = p.name.charAt(0).toUpperCase();
-        workerName.textContent = p.name;
-        workerJob.textContent = p.job + ' · ' + p.location;
-        workerStatus.textContent = p.status.toUpperCase();
-        if (p.cv) {
-          updateCvLink.value = p.cv;
-          cvStatus.innerHTML = '<a href="' + p.cv + '" target="_blank" class="text-gold underline">View Current CV</a>';
-        } else {
-          cvStatus.textContent = 'No CV uploaded yet.';
-        }
-      }
-    } catch(e) { console.error('Profile load error', e); }
-
-    loadWorkerInterviews();
-  }
-
-  async function loadWorkerInterviews() {
-    if (!TG_USER_ID) return;
-    try {
-      const res = await fetch(SUPABASE_URL + '/rest/v1/rpc/get_worker_interviews', {
-        method: 'POST',
-        headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ tg_id: TG_USER_ID })
-      });
-      const interviews = await res.json();
-      if (interviews && interviews.length > 0) {
-        interviewsList.innerHTML = interviews.map(i => {
-          const date = new Date(i.interview_date).toLocaleString();
-          return '<div class="card p-4 border-l-4 border-gold">' +
-            '<p class="text-[13px] font-extrabold text-gold">' + i.company_name + '</p>' +
-            '<p class="text-[11.5px] text-slate-300 mt-1">📅 ' + date + '</p>' +
-            (i.message ? '<p class="text-[10.5px] text-slate-400 mt-2 bg-white/5 p-2 rounded-lg">"' + i.message + '"</p>' : '') +
-          '</div>';
-        }).join('');
-      } else {
-        interviewsList.innerHTML = '<div class="card p-5 text-center"><p class="text-[11.5px] text-slate-400">No interview invitations yet.</p></div>';
-      }
-    } catch(e) { console.error('Interviews load error', e); }
-  }
-
-  updateCvBtn.addEventListener('click', async function() {
-    const newCv = updateCvLink.value.trim();
-    if (!newCv || !TG_USER_ID) return;
-    this.textContent = '...';
-    try {
-      await fetch(SUPABASE_URL + '/rest/v1/rpc/update_worker_cv', {
-        method: 'POST',
-        headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ tg_id: TG_USER_ID, new_cv: newCv })
-      });
-      this.textContent = 'Saved!';
-      cvStatus.innerHTML = '<a href="' + newCv + '" target="_blank" class="text-gold underline">View Current CV</a>';
-      setTimeout(() => this.textContent = 'Save', 2000);
-    } catch(e) {
-      this.textContent = 'Error';
-      setTimeout(() => this.textContent = 'Save', 2000);
-    }
-  });
-
-  /* ============ EMPLOYER REGISTER ============ */
-  employerForm.addEventListener('submit', async function(e){
-    e.preventDefault();
-    hideBox(empError);
-    if (!employerForm.checkValidity()) { employerForm.reportValidity(); return; }
-    const fd = new FormData(employerForm);
-    const companyName = val(fd,'companyName');
-    const licenseNumber = val(fd,'licenseNumber');
-    const officeAddress = val(fd,'officeAddress');
-    const email = val(fd,'employerEmail');
-    const phone = val(fd,'employerPhone');
-    const jobs = fd.getAll('employerJobs').map(j => String(j).trim()).filter(Boolean);
-    if (!jobs.length) { showBox(empError, empErrorText, 'Please select at least one role you recruit for.'); return; }
+  async function loadRecruiterLeads() {
+    const job = document.getElementById('searchJob').value;
+    const qual = document.getElementById('searchQual').value;
+    let url = `${SUPABASE_URL}/rest/v1/recruiter_lead_preview?select=*`;
+    if (job) url += `&job=ilike.%${job}%`;
+    if (qual) url += `&qualification=ilike.%${qual}%`;
     
-    // Give 1 Free Credit!
-    const payload = { 
-      company_name: companyName, 
-      license_number: licenseNumber,
-      office_address: officeAddress,
-      email, phone, jobs, 
-      telegram_id: TG_USER_ID, 
-      role: 'employer', 
-      credits: 1 
-    };
+    const res = await fetch(url, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } });
+    const leads = await res.json();
     
-    setLoading(empSubmitBtn, empSpinner, empBtnText, true, 'Create Account & Get 1 Free Lead', 'Creating…');
-    try {
-      const res = await fetch(SUPABASE_URL + '/rest/v1/employer_registrations', {
-        method: 'POST',
-        headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
-        body: JSON.stringify(payload)
-      });
-      if (!res.ok) throw new Error(await res.text());
-      safeSet('wb_employer_name', companyName || 'Recruitment');
-      safeSet('wb_employer_email', email || '');
-      safeSetJSON('wb_employer_jobs', jobs);
-      safeSet('wb_has_license', licenseNumber ? 'yes' : 'no');
-      employerForm.reset();
-      setLoading(empSubmitBtn, empSpinner, empBtnText, false, 'Create Account & Get 1 Free Lead', 'Creating…');
-      showView('view-employer-dash');
-    } catch(err) {
-      setLoading(empSubmitBtn, empSpinner, empBtnText, false, 'Create Account & Get 1 Free Lead', 'Creating…');
-      showBox(empError, empErrorText, 'Could not create your account. Please check your connection and try again.');
-      console.error('[WorldBridge] employer reg error:', err);
-    }
-  });
-
-  /* ============ EMPLOYER DASHBOARD ============ */
-  async function hydrateDashboardHeader() {
-    dashCompany.textContent = safeGet('wb_employer_name') || 'Recruitment';
-    
-    // Check verification banner
-    if (safeGet('wb_has_license') === 'no' || safeGet('wb_has_license') === null) {
-      verificationBanner.classList.remove('hidden');
-    } else {
-      verificationBanner.classList.add('hidden');
-    }
-
-    if (TG_USER_ID) {
-      try {
-        const res = await fetch(SUPABASE_URL + '/rest/v1/rpc/get_my_credits', {
-          method: 'POST',
-          headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY, 'Content-Type': 'application/json' },
-          body: JSON.stringify({ tg_id: TG_USER_ID })
-        });
-        if (res.ok) {
-          const credits = await res.json();
-          dashCredits.textContent = credits || 0;
-        }
-      } catch(e){}
-    }
-    
-    const savedJobs = safeGetJSON('wb_employer_jobs');
-    hiringChips.innerHTML = '';
-    if (Array.isArray(savedJobs) && savedJobs.length) {
-      hiringFocus.classList.remove('hidden');
-      savedJobs.forEach(function(job){
-        const chip = document.createElement('span');
-        chip.className = 'text-[10px] font-extrabold px-2 py-1 rounded-full bg-gold/15 text-gold border border-gold/30';
-        chip.textContent = job;
-        hiringChips.appendChild(chip);
-      });
-    } else hiringFocus.classList.add('hidden');
+    document.getElementById('recruiterLeadsList').innerHTML = leads.map(l => `
+      <div class="card p-4 flex gap-3 items-center">
+        <input type="checkbox" value="${l.id}" onchange="toggleCart(this)" class="w-5 h-5 accent-gold">
+        <div class="flex-1">
+          <p class="font-bold">${l.name_masked}</p>
+          <p class="text-xs text-slate-400">${l.job} · ${l.qualification} · ${l.experience}</p>
+        </div>
+        <div class="text-emerald-400 text-[10px] font-bold">${l.passport ? 'PASSPORT ✓' : ''}</div>
+      </div>
+    `).join('');
   }
 
-  async function loadLeads() {
-    leadsList.innerHTML = '<p class="text-center text-slate-500 text-[11.5px] py-8">Loading leads…</p>';
-    dashCount.textContent = '—';
-    try {
-      const res = await fetch(SUPABASE_URL + '/rest/v1/employer_lead_preview?select=id,job,location,experience,qualification,ready,passport,name_masked,phone_masked,created_at&order=created_at.desc&limit=30', {
-        headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
-      });
-      if (!res.ok) throw new Error('Fetch failed (' + res.status + ')');
-      const leads = await res.json();
-      renderLeads(leads);
-    } catch(err) {
-      leadsList.innerHTML = '<div class="card p-5 text-center"><p class="text-[11.5px] text-slate-400">Could not load leads right now. Pull to refresh.</p></div>';
-      dashCount.textContent = '—';
-    }
+  function toggleCart(cb) {
+    if (cb.checked) cart.push(cb.value);
+    else cart = cart.filter(id => id !== cb.value);
+    const banner = document.getElementById('cartBanner');
+    if (cart.length > 0) { banner.classList.remove('hidden'); document.getElementById('cartTotal').textContent = `${cart.length} Leads Selected`; }
+    else banner.classList.add('hidden');
   }
 
-  function escapeHtml(str) {
-    if (str == null) return '—';
-    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+  function calculatePrice(count) {
+    let buckets = Math.floor(count / 5);
+    let rem = count % 5;
+    let price = buckets * 80;
+    if (rem === 1) price += 20; if (rem === 2) price += 40; if (rem === 3) price += 50; if (rem === 4) price += 60;
+    return price;
   }
 
-  function renderLeads(leads) {
-    dashCount.textContent = leads.length;
-    if (!leads.length) {
-      leadsList.innerHTML = '<div class="card p-6 text-center"><p class="text-[12px] text-slate-400">No leads available right now.</p><p class="text-[10.5px] text-slate-500 mt-1">New applications appear here automatically.</p></div>';
-      return;
-    }
-    leadsList.innerHTML = leads.map(function(lead){
-      const badge = lead.passport
-        ? '<span class="text-[9.5px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/25">PASSPORT ✓</span>'
-        : '<span class="text-[9.5px] font-extrabold px-2 py-0.5 rounded-full bg-white/5 text-slate-400 border border-white/10">NO PASSPORT</span>';
-      return '<div class="card p-4">' +
-        '<div class="flex items-start justify-between gap-3"><div class="min-w-0"><p class="text-[13.5px] font-extrabold leading-tight truncate">' + escapeHtml(lead.name_masked) + '</p><p class="text-[11px] text-slate-400 mt-0.5 truncate">' + escapeHtml(lead.job) + ' · ' + escapeHtml(lead.location) + '</p></div>' + badge + '</div>' +
-        '<div class="mt-3 grid grid-cols-2 gap-2">' +
-          '<div class="rounded-lg bg-white/5 px-2.5 py-2"><p class="text-[9px] font-bold uppercase tracking-wider text-slate-500">Phone</p><p class="text-[11.5px] font-bold text-slate-300 mt-0.5">' + escapeHtml(lead.phone_masked) + '</p></div>' +
-          '<div class="rounded-lg bg-white/5 px-2.5 py-2"><p class="text-[9px] font-bold uppercase tracking-wider text-slate-500">Experience</p><p class="text-[11.5px] font-bold text-slate-300 mt-0.5 truncate">' + escapeHtml(lead.experience) + '</p></div>' +
-          '<div class="rounded-lg bg-white/5 px-2.5 py-2"><p class="text-[9px] font-bold uppercase tracking-wider text-slate-500">Qualification</p><p class="text-[11.5px] font-bold text-slate-300 mt-0.5 truncate">' + escapeHtml(lead.qualification) + '</p></div>' +
-          '<div class="rounded-lg bg-white/5 px-2.5 py-2"><p class="text-[9px] font-bold uppercase tracking-wider text-slate-500">Ready</p><p class="text-[11.5px] font-bold text-slate-300 mt-0.5 truncate">' + escapeHtml(lead.ready) + '</p></div>' +
-        '</div>' +
-        '<div class="mt-3 flex gap-2">' +
-          '<button type="button" class="flex-1 rounded-xl bg-gold/15 border border-gold/30 text-gold font-extrabold text-[12px] py-2.5 active:scale-[0.98] transition" data-unlock="' + escapeHtml(lead.id) + '">Unlock Details</button>' +
-          '<button type="button" class="flex-1 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 font-extrabold text-[12px] py-2.5 active:scale-[0.98] transition" data-interview="' + escapeHtml(lead.id) + '">Schedule Interview</button>' +
-        '</div>' +
-      '</div>';
-    }).join('');
-    
-    leadsList.querySelectorAll('[data-unlock]').forEach(btn => btn.addEventListener('click', openUsdtModal));
-    leadsList.querySelectorAll('[data-interview]').forEach(btn => btn.addEventListener('click', () => openInterviewModal(btn.dataset.interview)));
+  async function checkoutCart() {
+    if (cart.length === 0) return;
+    let finalPrice = (calculatePrice(cart.length) * 0.9).toFixed(2);
+    let uniqueAmount = (parseFloat(finalPrice) + (Math.random() * 0.05)).toFixed(4);
+    loading(true);
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/process_checkout`, {
+      method: 'POST', headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ r_tg_id: TG_ID, lead_ids_arr: cart, total_usd: parseFloat(uniqueAmount) })
+    });
+    const data = await res.json();
+    currentOrderRef = data.reference;
+    document.getElementById('checkoutAmount').textContent = `${uniqueAmount} USDT`;
+    loading(false); showView('view-checkout');
   }
 
-  /* ============ VERIFY LICENSE ============ */
-  window.openVerifyModal = function() {
-    verifyModal.classList.remove('hidden');
-    document.body.style.overflow = 'hidden';
-  }
-
-  function closeVerifyModal() {
-    verifyModal.classList.add('hidden');
-    document.body.style.overflow = '';
-  }
-
-  verifyModal.querySelectorAll('[data-close-verify-modal]').forEach(el => el.addEventListener('click', closeVerifyModal));
-
-  saveVerifyBtn.addEventListener('click', async function() {
-    const lic = verifyLicense.value.trim();
-    const addr = verifyAddress.value.trim();
-    if (!lic) return alert('Please enter your Trade License Number');
-    this.textContent = 'Saving...';
-    this.disabled = true;
-
-    try {
-      const res = await fetch(SUPABASE_URL + '/rest/v1/rpc/update_employer_license', {
-        method: 'POST',
-        headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ tg_id: TG_USER_ID, new_license: lic, new_address: addr })
-      });
-      if (!res.ok) throw new Error(await res.text());
-      
-      safeSet('wb_has_license', 'yes');
-      this.textContent = 'Verified!';
-      setTimeout(() => {
-        closeVerifyModal();
-        this.textContent = 'Save & Verify';
-        this.disabled = false;
-        verificationBanner.classList.add('hidden');
-        alert('Trade License submitted! You now have the Verified Badge.');
-      }, 1000);
-
-    } catch(e) {
-      console.error(e);
-      this.textContent = 'Error';
-      setTimeout(() => {
-        this.textContent = 'Save & Verify';
-        this.disabled = false;
-      }, 2000);
-    }
-  });
-
-  /* ============ SCHEDULE INTERVIEW ============ */
-  function openInterviewModal(id) {
-    currentWorkerId = id;
-    interviewModal.classList.remove('hidden');
-    document.body.style.overflow = 'hidden';
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    tomorrow.setHours(10, 0, 0, 0);
-    intDate.value = tomorrow.toISOString().slice(0, 16);
-  }
-
-  function closeInterviewModal() {
-    interviewModal.classList.add('hidden');
-    document.body.style.overflow = '';
-    currentWorkerId = null;
-  }
-
-  interviewModal.querySelectorAll('[data-close-int-modal]').forEach(el => el.addEventListener('click', closeInterviewModal));
-
-  sendInterviewBtn.addEventListener('click', async function() {
-    if (!currentWorkerId || !intDate.value) return;
-    this.textContent = 'Sending...';
-    this.disabled = true;
-
-    try {
-      const res = await fetch(SUPABASE_URL + '/rest/v1/rpc/schedule_interview', {
-        method: 'POST',
-        headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY, 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          worker_id: currentWorkerId,
-          emp_tg_id: TG_USER_ID,
-          emp_name: safeGet('wb_employer_name') || 'Recruitment Office',
-          int_date: new Date(intDate.value).toISOString(),
-          msg: intMessage.value.trim() || null
-        })
-      });
-      if (!res.ok) throw new Error(await res.text());
-      
-      this.textContent = 'Sent!';
-      setTimeout(() => {
-        closeInterviewModal();
-        this.textContent = 'Send Invitation (Free)';
-        this.disabled = false;
-        alert('Interview invitation sent to the worker successfully!');
-      }, 1000);
-
-    } catch(e) {
-      console.error(e);
-      this.textContent = 'Error';
-      setTimeout(() => {
-        this.textContent = 'Send Invitation (Free)';
-        this.disabled = false;
-      }, 2000);
-    }
-  });
-
-  /* ============ USDT MODAL ============ */
-  function openUsdtModal() {
-    usdtModal.classList.remove('hidden');
-    document.body.style.overflow = 'hidden';
-    showModalStep('packages');
-    renderPackages();
-    if (tg && tg.HapticFeedback) { try { tg.HapticFeedback.impactOccurred('light'); } catch(e){} }
-  }
-  function closeUsdtModal() {
-    usdtModal.classList.add('hidden');
-    document.body.style.overflow = '';
-  }
-  function showModalStep(step) {
-    document.getElementById('stepPackages').classList.toggle('hidden', step !== 'packages');
-    document.getElementById('stepPayment').classList.toggle('hidden', step !== 'payment');
-    document.getElementById('stepClaimed').classList.toggle('hidden', step !== 'claimed');
-  }
-  function renderPackages() {
-    const list = document.getElementById('packageList');
-    list.innerHTML = PACKAGES.map(p =>
-      '<button type="button" class="w-full text-left rounded-xl bg-white/5 border border-white/10 p-3 flex items-center gap-3 active:scale-[0.98] transition" data-pkg="' + p.id + '">' +
-        '<div class="w-10 h-10 rounded-lg bg-gold/15 border border-gold/25 flex items-center justify-center shrink-0"><span class="font-extrabold text-gold text-[13px]">' + p.credits + '</span></div>' +
-        '<div class="flex-1"><p class="text-[13px] font-extrabold">' + p.label + ' · $' + p.price + '</p><p class="text-[10.5px] text-slate-400">' + p.desc + '</p></div>' +
-        '<span class="text-slate-500">›</span>' +
-      '</button>'
-    ).join('');
-    list.querySelectorAll('[data-pkg]').forEach(b => b.addEventListener('click', () => {
-      const pkg = PACKAGES.find(p => p.id === b.dataset.pkg);
-      if (pkg) createOrder(pkg);
-    }));
-  }
-  function generateReference() {
-    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-    let r = 'WB-';
-    for (let i = 0; i < 6; i++) r += chars[Math.floor(Math.random() * chars.length)];
-    return r;
-  }
-  function generateUniqueAmount(base) {
-    const tail = Math.floor(Math.random() * 9000) + 1000;
-    return (base + tail / 10000).toFixed(4);
-  }
-  async function createOrder(pkg) {
-    const ref = generateReference();
-    const amount = generateUniqueAmount(pkg.price);
-    const payload = {
-      telegram_id: TG_USER_ID,
-      company_name: safeGet('wb_employer_name') || 'Recruitment',
-      package_id: pkg.id,
-      credits: pkg.credits,
-      amount_usdt: parseFloat(amount),
-      reference: ref,
-      status: 'pending'
-    };
-    try {
-      const res = await fetch(SUPABASE_URL + '/rest/v1/payment_orders', {
-        method: 'POST',
-        headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=representation' },
-        body: JSON.stringify(payload)
-      });
-      if (!res.ok) throw new Error(await res.text());
-      const rows = await res.json();
-      currentOrder = rows[0];
-      document.getElementById('payAmount').textContent = amount + ' USDT';
-      document.getElementById('payAddress').textContent = USDT_ADDRESS;
-      document.getElementById('payRef').textContent = ref;
-      document.getElementById('qrImg').src = 'https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=' + encodeURIComponent(USDT_ADDRESS);
-      showModalStep('payment');
-    } catch(err) {
-      console.error('Order creation failed:', err);
-      alert('Could not create order. Please try again.');
-    }
-  }
   async function claimPayment() {
-    if (!currentOrder) return;
-    try {
-      const res = await fetch(SUPABASE_URL + '/rest/v1/payment_orders?id=eq.' + currentOrder.id, {
-        method: 'PATCH',
-        headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: 'claimed', claimed_at: new Date().toISOString() })
-      });
-      if (!res.ok) throw new Error(await res.text());
-      showModalStep('claimed');
-    } catch(err) {
-      console.error('Claim failed:', err);
-      alert('Could not submit. Please try again.');
-    }
+    loading(true);
+    await fetch(`${SUPABASE_URL}/rest/v1/orders?reference=eq.${currentOrderRef}`, {
+      method: 'PATCH', headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ status: 'claimed' })
+    });
+    loading(false); alert("Payment claimed! Admin will verify."); cart = []; showView('view-recruiter-dash');
   }
 
-  buyCreditsBtn.addEventListener('click', openUsdtModal);
-  usdtModal.querySelectorAll('[data-close-modal]').forEach(el => el.addEventListener('click', closeUsdtModal));
-  document.getElementById('sentBtn').addEventListener('click', claimPayment);
-  document.getElementById('backToPackages').addEventListener('click', () => showModalStep('packages'));
-  document.getElementById('copyAmount').addEventListener('click', function(){
-    navigator.clipboard.writeText(document.getElementById('payAmount').textContent.replace(' USDT',''));
-    this.textContent = 'Copied'; setTimeout(() => this.textContent = 'Copy', 1500);
-  });
-  document.getElementById('copyAddress').addEventListener('click', function(){
-    navigator.clipboard.writeText(USDT_ADDRESS);
-    this.textContent = 'Copied'; setTimeout(() => this.textContent = 'Copy', 1500);
+  // --- AGENT LOGIC ---
+  document.getElementById('agentRegForm').addEventListener('submit', async (e) => {
+    e.preventDefault(); loading(true);
+    const data = Object.fromEntries(new FormData(e.target).entries());
+    data.telegram_id = TG_ID;
+    await fetch(`${SUPABASE_URL}/rest/v1/agents`, {
+      method: 'POST', headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' }, body: JSON.stringify(data)
+    });
+    loading(false); showView('view-agent-dash'); loadAgentDash();
   });
 
-  /* ============ INIT ============ */
-  (function init(){
-    const savedRole = safeGet('wb_role');
-    if (savedRole === 'worker') {
-      if (TG_USER_ID) {
-        fetch(SUPABASE_URL + '/rest/v1/rpc/get_worker_profile', {
-          method: 'POST',
-          headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY, 'Content-Type': 'application/json' },
-          body: JSON.stringify({ tg_id: TG_USER_ID })
-        }).then(res => res.json()).then(profiles => {
-          if (profiles && profiles.length > 0) showView('view-worker-dash');
-          else showView('view-welcome');
-        }).catch(() => showView('view-welcome'));
-      } else {
-        showView('view-welcome');
-      }
-    } else if (savedRole === 'employer') {
-      if (safeGet('wb_employer_name')) showView('view-employer-dash');
-      else showView('view-employer-reg');
-    } else {
-      showView('view-role');
+  async function loadAgentDash() {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/agents?telegram_id=eq.${TG_ID}`, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } });
+    const data = await res.json();
+    if (data.length > 0) document.getElementById('agentEarnings').textContent = data[0].total_earnings;
+
+    const leads = await fetch(`${SUPABASE_URL}/rest/v1/gulf_leads?agent_telegram_id=eq.${TG_ID}`, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } }).then(r => r.json());
+    document.getElementById('agentLeadsList').innerHTML = leads.map(l => `<div class="card p-3"><p class="font-bold text-sm">${l.name}</p><p class="text-xs text-slate-400">${l.job} · ${l.phone}</p></div>`).join('');
+  }
+
+  document.getElementById('agentAddForm').addEventListener('submit', async (e) => {
+    e.preventDefault(); loading(true);
+    const data = Object.fromEntries(new FormData(e.target).entries());
+    data.added_by_role = 'agent'; data.agent_telegram_id = TG_ID;
+    await fetch(`${SUPABASE_URL}/rest/v1/gulf_leads`, {
+      method: 'POST', headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' }, body: JSON.stringify(data)
+    });
+    loading(false); showView('view-agent-dash'); loadAgentDash();
+  });
+
+  document.getElementById('agentProfileForm').addEventListener('submit', async (e) => {
+    e.preventDefault(); loading(true);
+    const data = Object.fromEntries(new FormData(e.target).entries());
+    await fetch(`${SUPABASE_URL}/rest/v1/agents?telegram_id=eq.${TG_ID}`, {
+      method: 'PATCH', headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' }, body: JSON.stringify(data)
+    });
+    loading(false); alert("Payout details saved!"); showView('view-agent-dash');
+  });
+
+  // --- SOURCER LOGIC ---
+  document.getElementById('sourcerRegForm').addEventListener('submit', async (e) => {
+    e.preventDefault(); loading(true);
+    const data = Object.fromEntries(new FormData(e.target).entries());
+    data.telegram_id = TG_ID;
+    data.referral_code = TG_ID.toString();
+    await fetch(`${SUPABASE_URL}/rest/v1/sourcers`, {
+      method: 'POST', headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' }, body: JSON.stringify(data)
+    });
+    loading(false); showView('view-sourcer-dash'); loadSourcerDash();
+  });
+
+  async function loadSourcerDash() {
+    const data = await fetch(`${SUPABASE_URL}/rest/v1/sourcers?telegram_id=eq.${TG_ID}`, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } }).then(r => r.json());
+    if (data.length > 0) {
+      document.getElementById('sourcerEarnings').textContent = data[0].total_earnings;
+      document.getElementById('refLink').textContent = `t.me/WorldBridgeBot?start=ref_${data[0].referral_code}`;
     }
-  })();
+    const leads = await fetch(`${SUPABASE_URL}/rest/v1/gulf_leads?referred_by_sourcer_tg_id=eq.${TG_ID}`, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } }).then(r => r.json());
+    document.getElementById('sourcerLeadsList').innerHTML = leads.map(l => `<div class="card p-3"><p class="font-bold text-sm">${l.name}</p><p class="text-xs text-slate-400">${l.job}</p></div>`).join('');
+  }
+
+  document.getElementById('sourcerProfileForm').addEventListener('submit', async (e) => {
+    e.preventDefault(); loading(true);
+    const data = Object.fromEntries(new FormData(e.target).entries());
+    await fetch(`${SUPABASE_URL}/rest/v1/sourcers?telegram_id=eq.${TG_ID}`, {
+      method: 'PATCH', headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' }, body: JSON.stringify(data)
+    });
+    loading(false); alert("Payout details saved!"); showView('view-sourcer-dash');
+  });
+
+  showView('view-role');
 </script>
 </body>
 </html>
