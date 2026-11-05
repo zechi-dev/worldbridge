@@ -170,8 +170,8 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
     </header>
     <div class="max-w-md mx-auto px-4 py-5 pb-24">
       <div class="flex gap-2 mb-5">
-        <input type="text" id="searchJob" placeholder="🔍 Search Job..." class="input text-xs bg-white/5" onkeyup="loadRecruiterLeads()">
-        <input type="text" id="searchQual" placeholder="🎓 Qualification..." class="input text-xs bg-white/5" onkeyup="loadRecruiterLeads()">
+        <input type="text" id="searchJob" placeholder="🔍 Search Job..." class="input text-xs bg-white/5" oninput="debouncedLoadLeads()">
+        <input type="text" id="searchQual" placeholder="🎓 Qualification..." class="input text-xs bg-white/5" oninput="debouncedLoadLeads()">
       </div>
       <h2 class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-3">Available Leads</h2>
       <div id="recruiterLeadsList" class="space-y-3"></div>
@@ -246,7 +246,7 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
         </div>
         <div class="card p-4 space-y-4 bg-navysoft">
           <div><label class="label">Job Category</label><select class="select text-white bg-navy" name="job" required><option value="">Select Job...</option><option>Caregiver</option><option>Driver</option><option>Security</option><option>Factory</option><option>Warehouse</option></select></div>
-          <div><label class="label">Qualification</label><select class="select text-white bg-navy" name="qualification" required><option value="">Select...</option><option>SSCE</option><option>OND</option><option>HND/BSc</option></select></div>
+          <div><label class="label">Qualification</label><select class="select text-white bg-navy" name="qualification" required><option value="">Select...</option><option>SSCE</option><option>OND</option><option>HND/BSc</option><option>Trade Cert</option></select></div>
           <div><label class="label">Experience</label><select class="select text-white bg-navy" name="experience" required><option value="">Select...</option><option>None</option><option>1-2 Years</option><option>3-5 Years</option></select></div>
         </div>
         <div><label class="label">CV Link (Optional)</label><input class="input" name="cv" placeholder="Google Drive / Dropbox link"></div>
@@ -342,308 +342,441 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
   let cart = [];
   let currentOrderRef = '';
 
-  if(tg) { tg.ready(); tg.expand(); }
+  if (tg) { tg.ready(); tg.expand(); }
 
+  // ---------- HELPERS ----------
   function escapeHTML(str) {
-    if (!str) return '';
+    if (str === null || str === undefined) return '';
     return String(str).replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag]));
   }
 
-  async function rpc(name, body) {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${name}`, {
-      method: 'POST',
-      headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify(body)
-    });
-    const out = await res.json().catch(() => null);
-    if (!res.ok) { 
-      console.error(name, out); 
-      alert(`${name} failed: ${out?.message || res.status}`); 
-      throw new Error(name); 
+  // Only allow http(s) links (blocks javascript: links)
+  function safeUrl(u) {
+    try {
+      const url = new URL(String(u).trim());
+      return (url.protocol === 'https:' || url.protocol === 'http:') ? url.href : '';
+    } catch (e) { return ''; }
+  }
+
+  // Empty strings -> null so the database stores clean values
+  function clean(obj) {
+    const out = {};
+    for (const k in obj) { const v = typeof obj[k] === 'string' ? obj[k].trim() : obj[k]; out[k] = (v === '') ? null : v; }
+    return out;
+  }
+
+  function needTelegram() {
+    if (TG_ID) return false;
+    alert("Please open WorldBridge from inside Telegram.");
+    return true;
+  }
+
+  // One checked request function. Throws on any failure so nothing fails silently.
+  async function api(path, method = 'GET', body = null, prefer = null) {
+    const headers = { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' };
+    if (prefer) headers.Prefer = prefer;
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, { method, headers, body: body ? JSON.stringify(body) : undefined });
+    const text = await res.text();
+    let out = null;
+    try { out = text ? JSON.parse(text) : null; } catch (e) { out = null; }
+    if (!res.ok) {
+      console.error(path, res.status, out);
+      throw new Error(out?.message || `Request failed (${res.status})`);
     }
-    return Array.isArray(out) ? out : (out ? [out] : []);
+    return out;
+  }
+
+  async function rpc(name, body) {
+    const out = await api(`rpc/${name}`, 'POST', body);
+    return Array.isArray(out) ? out : ((out !== null && out !== undefined) ? [out] : []);
+  }
+
+  // PATCH that also confirms a row was really updated
+  async function patchRow(path, body) {
+    const rows = await api(path, 'PATCH', body, 'return=representation');
+    if (!rows || rows.length === 0) throw new Error("Nothing was updated. Your profile was not found.");
+    return rows;
   }
 
   function showView(id) {
     document.querySelectorAll('.view').forEach(el => el.classList.add('hidden'));
     document.getElementById(id).classList.remove('hidden');
-    window.scrollTo(0,0);
+    window.scrollTo(0, 0);
   }
   function loading(show) { document.getElementById('loadingOverlay').classList.toggle('hidden', !show); }
 
-  // --- AUTO-LOGIN CHECK ---
+  function fail(e, prefix) {
+    loading(false);
+    alert((prefix ? prefix + ": " : "") + (e && e.message ? e.message : "Something went wrong. Please try again."));
+  }
+
+  // ---------- AUTO-LOGIN ----------
   async function checkAutoLogin() {
     if (!TG_ID) { showView('view-role'); return; }
     loading(true);
     try {
       const data = await rpc('check_user_role', { p_tg_id: TG_ID });
       loading(false);
+      const role = data[0] && data[0].role;
 
-      if (data[0] && data[0].role === 'worker') { loadWorkerDash(); return; }
-      if (data[0] && data[0].role === 'recruiter') { 
+      if (role === 'worker') { loadWorkerDash(); return; }
+      if (role === 'recruiter') {
         document.getElementById('recruiterNameDisplay').textContent = data[0].company_name || 'Recruiter';
-        showView('view-recruiter-dash'); loadRecruiterLeads(); return; 
+        showView('view-recruiter-dash'); loadRecruiterLeads(); return;
       }
-      if (data[0] && data[0].role === 'agent') { showView('view-agent-dash'); loadAgentDash(); return; }
-      if (data[0] && data[0].role === 'sourcer') { showView('view-sourcer-dash'); loadSourcerDash(); return; }
-
+      if (role === 'agent') { showView('view-agent-dash'); loadAgentDash(); return; }
+      if (role === 'sourcer') { showView('view-sourcer-dash'); loadSourcerDash(); return; }
       showView('view-role');
     } catch (e) { console.error(e); loading(false); showView('view-role'); }
   }
 
   function selectRole(role) {
+    if (needTelegram()) return;
     if (role === 'worker') showView('view-worker-reg');
     if (role === 'recruiter') showView('view-recruiter-reg');
     if (role === 'agent') showView('view-agent-reg');
     if (role === 'sourcer') showView('view-sourcer-reg');
   }
 
-  // --- WORKER LOGIC ---
+  // ---------- WORKER ----------
   document.getElementById('workerForm').addEventListener('submit', async (e) => {
-    e.preventDefault(); loading(true);
-    const data = Object.fromEntries(new FormData(e.target).entries());
-    data.added_by_role = 'worker'; data.telegram_id = TG_ID; data.location = 'Nigeria';
-    
-    // FIX: Capture the referral code from the URL
-    const startParam = tg?.initDataUnsafe?.start_param;
-    if (startParam && startParam.startsWith('ref_')) {
-      const refCode = startParam.replace('ref_', '');
-      // Look up the Sourcer's Telegram ID using the code
-      try {
-        const sourcerIdRes = await rpc('get_sourcer_id_by_code', { p_code: refCode });
-        if (sourcerIdRes && sourcerIdRes[0]) {
-          data.referred_by_sourcer_tg_id = sourcerIdRes[0];
-        }
-      } catch (e) { console.error("Referral lookup failed", e); }
-    }
+    e.preventDefault();
+    if (needTelegram()) return;
+    loading(true);
+    try {
+      const data = clean(Object.fromEntries(new FormData(e.target).entries()));
+      data.added_by_role = 'worker'; data.telegram_id = TG_ID; data.location = 'Nigeria';
 
-    await fetch(`${SUPABASE_URL}/rest/v1/gulf_leads`, { method: 'POST', headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
-    loading(false); alert("Application submitted!"); loadWorkerDash();
+      // Already registered? Update instead of creating a duplicate.
+      let existing = [];
+      try { existing = await api(`gulf_leads?telegram_id=eq.${TG_ID}&select=id`) || []; } catch (err) { existing = []; }
+
+      if (existing.length > 0) {
+        delete data.added_by_role; delete data.telegram_id;
+        await patchRow(`gulf_leads?telegram_id=eq.${TG_ID}`, data);
+      } else {
+        // Capture referral code from the Telegram start link
+        const startParam = tg?.initDataUnsafe?.start_param;
+        if (startParam && startParam.startsWith('ref_')) {
+          const refCode = startParam.replace('ref_', '');
+          try {
+            const r = await rpc('get_sourcer_id_by_code', { p_code: refCode });
+            if (r && r[0] !== undefined && r[0] !== null) {
+              data.referred_by_sourcer_tg_id = (typeof r[0] === 'object') ? Object.values(r[0])[0] : r[0];
+            }
+          } catch (err) { console.error("Referral lookup failed", err); }
+        }
+        await api('gulf_leads', 'POST', data, 'return=minimal');
+      }
+      loading(false); alert("Application submitted!"); loadWorkerDash();
+    } catch (err) { fail(err, "Could not submit application"); }
   });
 
   async function loadWorkerDash() {
     showView('view-worker-dash');
     if (!TG_ID) return;
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/gulf_leads?telegram_id=eq.${TG_ID}&select=*`, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } });
-    const data = await res.json();
-    if (data.length > 0 && data[0].cv) {
-      document.getElementById('workerCvUpdate').value = data[0].cv;
-      document.getElementById('cvStatus').innerHTML = `<a href="${escapeHTML(data[0].cv)}" target="_blank" class="text-gold underline font-bold">✓ View Current CV</a>`;
-    }
+    try {
+      const data = await api(`gulf_leads?telegram_id=eq.${TG_ID}&select=*`) || [];
+      const link = data.length > 0 ? safeUrl(data[0].cv) : '';
+      if (link) {
+        document.getElementById('workerCvUpdate').value = link;
+        document.getElementById('cvStatus').innerHTML = `<a href="${escapeHTML(link)}" target="_blank" rel="noopener" class="text-gold underline font-bold">✓ View Current CV</a>`;
+      }
+    } catch (e) { console.error(e); }
   }
 
   async function updateWorkerCv() {
-    const cv = document.getElementById('workerCvUpdate').value;
-    if(!cv) return;
-    await fetch(`${SUPABASE_URL}/rest/v1/gulf_leads?telegram_id=eq.${TG_ID}`, { method: 'PATCH', headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ cv }) });
-    document.getElementById('cvStatus').innerHTML = `<a href="${escapeHTML(cv)}" target="_blank" class="text-gold underline font-bold">✓ View Current CV</a>`;
-    alert("CV Updated!");
+    if (needTelegram()) return;
+    const cv = safeUrl(document.getElementById('workerCvUpdate').value);
+    if (!cv) { alert("Please paste a valid link starting with https://"); return; }
+    try {
+      await patchRow(`gulf_leads?telegram_id=eq.${TG_ID}`, { cv });
+      document.getElementById('cvStatus').innerHTML = `<a href="${escapeHTML(cv)}" target="_blank" rel="noopener" class="text-gold underline font-bold">✓ View Current CV</a>`;
+      alert("CV Updated!");
+    } catch (e) { fail(e, "Could not save CV"); }
   }
 
-  // --- RECRUITER LOGIC ---
+  // ---------- RECRUITER ----------
   document.getElementById('recruiterForm').addEventListener('submit', async (e) => {
-    e.preventDefault(); loading(true);
-    const data = Object.fromEntries(new FormData(e.target).entries());
-    data.telegram_id = TG_ID;
-    await fetch(`${SUPABASE_URL}/rest/v1/recruiters`, { method: 'POST', headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
-    loading(false); 
-    document.getElementById('recruiterNameDisplay').textContent = data.company_name;
-    showView('view-recruiter-dash'); loadRecruiterLeads();
+    e.preventDefault();
+    if (needTelegram()) return;
+    loading(true);
+    try {
+      const data = clean(Object.fromEntries(new FormData(e.target).entries()));
+      data.telegram_id = TG_ID;
+
+      let existing = [];
+      try { existing = await api(`recruiters?telegram_id=eq.${TG_ID}&select=id`) || []; } catch (err) { existing = []; }
+
+      if (existing.length > 0) {
+        delete data.telegram_id;
+        await patchRow(`recruiters?telegram_id=eq.${TG_ID}`, data);
+      } else {
+        await api('recruiters', 'POST', data, 'return=minimal');
+      }
+      loading(false);
+      document.getElementById('recruiterNameDisplay').textContent = data.company_name;
+      showView('view-recruiter-dash'); loadRecruiterLeads();
+    } catch (err) { fail(err, "Could not create account"); }
   });
 
-  async function loadRecruiterLeads() {
-    const job = document.getElementById('searchJob').value;
-    const qual = document.getElementById('searchQual').value;
-    let url = `${SUPABASE_URL}/rest/v1/recruiter_lead_preview?select=*`;
-    if (job) url += `&job=ilike.%${job}%`;
-    if (qual) url += `&qualification=ilike.%${qual}%`;
-    
-    const res = await fetch(url, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } });
-    const leads = await res.json();
-    
-    if (leads.length === 0) {
-      document.getElementById('recruiterLeadsList').innerHTML = `<div class="card p-6 text-center border-dashed border-white/20 bg-transparent"><p class="text-xs text-slate-500">No candidates found matching your search.</p></div>`;
-      return;
-    }
+  let leadsTimer = null;
+  function debouncedLoadLeads() { clearTimeout(leadsTimer); leadsTimer = setTimeout(loadRecruiterLeads, 350); }
 
-    document.getElementById('recruiterLeadsList').innerHTML = leads.map(l => `
-      <div class="card p-4 flex gap-3 items-center bg-navysoft/50">
-        <input type="checkbox" value="${escapeHTML(l.id)}" onchange="toggleCart(this)" class="w-5 h-5 accent-gold rounded cursor-pointer">
-        <div class="flex-1 cursor-pointer" onclick="this.parentElement.querySelector('input').click()">
-          <p class="font-bold text-[13.5px]">${escapeHTML(l.name_masked)}</p>
-          <p class="text-[11px] text-slate-400">${escapeHTML(l.job)} · ${escapeHTML(l.qualification)} · ${escapeHTML(l.experience)}</p>
+  async function loadRecruiterLeads() {
+    const job = document.getElementById('searchJob').value.trim();
+    const qual = document.getElementById('searchQual').value.trim();
+    let path = `recruiter_lead_preview?select=*`;
+    if (job) path += `&job=ilike.*${encodeURIComponent(job)}*`;
+    if (qual) path += `&qualification=ilike.*${encodeURIComponent(qual)}*`;
+
+    const box = document.getElementById('recruiterLeadsList');
+    try {
+      const leads = await api(path) || [];
+      if (leads.length === 0) {
+        box.innerHTML = `<div class="card p-6 text-center border-dashed border-white/20 bg-transparent"><p class="text-xs text-slate-500">No candidates found matching your search.</p></div>`;
+        return;
+      }
+      box.innerHTML = leads.map(l => `
+        <div class="card p-4 flex gap-3 items-center bg-navysoft/50">
+          <input type="checkbox" value="${escapeHTML(l.id)}" ${cart.includes(String(l.id)) ? 'checked' : ''} onchange="toggleCart(this)" class="w-5 h-5 accent-gold rounded cursor-pointer">
+          <div class="flex-1 cursor-pointer" onclick="this.parentElement.querySelector('input').click()">
+            <p class="font-bold text-[13.5px]">${escapeHTML(l.name_masked)}</p>
+            <p class="text-[11px] text-slate-400">${escapeHTML(l.job)} · ${escapeHTML(l.qualification)} · ${escapeHTML(l.experience)}</p>
+          </div>
+          <div class="text-emerald-400 text-[9px] font-extrabold tracking-wider px-2 py-1 bg-emerald-500/10 rounded border border-emerald-500/20">${l.passport ? 'PASSPORT ✓' : 'NO PP'}</div>
         </div>
-        <div class="text-emerald-400 text-[9px] font-extrabold tracking-wider px-2 py-1 bg-emerald-500/10 rounded border border-emerald-500/20">${l.passport ? 'PASSPORT ✓' : 'NO PP'}</div>
-      </div>
-    `).join('');
+      `).join('');
+    } catch (e) {
+      console.error(e);
+      box.innerHTML = `<div class="card p-6 text-center border-dashed border-white/20 bg-transparent"><p class="text-xs text-slate-500">Could not load candidates. Please reopen the app.</p></div>`;
+    }
+  }
+
+  function updateCartBanner() {
+    const banner = document.getElementById('cartBanner');
+    if (cart.length > 0) {
+      banner.classList.remove('hidden');
+      document.getElementById('cartTotal').textContent = `${cart.length} Leads Selected`;
+    } else banner.classList.add('hidden');
   }
 
   function toggleCart(cb) {
-    if (cb.checked) cart.push(cb.value);
-    else cart = cart.filter(id => id !== cb.value);
-    const banner = document.getElementById('cartBanner');
-    if (cart.length > 0) { banner.classList.remove('hidden'); document.getElementById('cartTotal').textContent = `${cart.length} Leads Selected`; }
-    else banner.classList.add('hidden');
+    const id = String(cb.value);
+    if (cb.checked) { if (!cart.includes(id)) cart.push(id); }
+    else cart = cart.filter(x => x !== id);
+    updateCartBanner();
   }
 
   function calculatePrice(count) {
-    let buckets = Math.floor(count / 5);
-    let rem = count % 5;
+    const buckets = Math.floor(count / 5);
+    const rem = count % 5;
     let price = buckets * 80;
-    if (rem === 1) price += 20; if (rem === 2) price += 40; if (rem === 3) price += 50; if (rem === 4) price += 60;
+    if (rem === 1) price += 20;
+    if (rem === 2) price += 40;
+    if (rem === 3) price += 50;
+    if (rem === 4) price += 60;
     return price;
   }
 
   async function checkoutCart() {
     if (cart.length === 0) return;
-    let finalPrice = (calculatePrice(cart.length) * 0.9).toFixed(2);
-    let uniqueAmount = (parseFloat(finalPrice) + (Math.random() * 0.05)).toFixed(4);
+    if (needTelegram()) return;
+    const finalPrice = (calculatePrice(cart.length) * 0.9).toFixed(2);
+    const uniqueAmount = (parseFloat(finalPrice) + (Math.random() * 0.05)).toFixed(4);
     loading(true);
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/process_checkout`, { method: 'POST', headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ r_tg_id: TG_ID, lead_ids_arr: cart, total_usd: parseFloat(uniqueAmount) }) });
-    const data = await res.json();
-    currentOrderRef = data.reference;
-    document.getElementById('checkoutAmount').textContent = `${uniqueAmount} USDT`;
-    loading(false); showView('view-checkout');
+    try {
+      const out = await rpc('process_checkout', { r_tg_id: TG_ID, lead_ids_arr: cart, total_usd: parseFloat(uniqueAmount) });
+      const r = out[0];
+      const ref = (r && typeof r === 'object') ? (r.reference || Object.values(r)[0]) : r;
+      if (!ref) throw new Error("Order was not created. Please try again.");
+      currentOrderRef = String(ref);
+      document.getElementById('checkoutAmount').textContent = `${uniqueAmount} USDT`;
+      loading(false); showView('view-checkout');
+    } catch (e) { fail(e, "Checkout failed"); }
   }
 
   async function claimPayment() {
+    if (!currentOrderRef) { alert("No active order. Please select leads and checkout again."); showView('view-recruiter-dash'); return; }
     loading(true);
-    await fetch(`${SUPABASE_URL}/rest/v1/orders?reference=eq.${currentOrderRef}`, { method: 'PATCH', headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ status: 'claimed' }) });
-    loading(false); alert("Payment claimed! Admin will verify."); cart = []; showView('view-recruiter-dash'); loadRecruiterLeads();
+    try {
+      await patchRow(`orders?reference=eq.${encodeURIComponent(currentOrderRef)}`, { status: 'claimed' });
+      loading(false);
+      alert("Payment claimed! Admin will verify.");
+      cart = []; currentOrderRef = ''; updateCartBanner();
+      showView('view-recruiter-dash'); loadRecruiterLeads();
+    } catch (e) { fail(e, "Could not claim payment"); }
   }
 
-  // --- AGENT LOGIC ---
+  // ---------- AGENT ----------
   document.getElementById('agentRegForm').addEventListener('submit', async (e) => {
-    e.preventDefault(); loading(true);
-    const data = Object.fromEntries(new FormData(e.target).entries());
-    data.telegram_id = TG_ID;
-    await fetch(`${SUPABASE_URL}/rest/v1/agents`, { method: 'POST', headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
-    loading(false); showView('view-agent-dash'); loadAgentDash();
+    e.preventDefault();
+    if (needTelegram()) return;
+    loading(true);
+    try {
+      const data = clean(Object.fromEntries(new FormData(e.target).entries()));
+      await rpc('create_agent_profile', {
+        p_name: data.name,
+        p_email: data.email,
+        p_phone: data.phone,
+        p_address: data.address,
+        p_candidate_pool: data.candidate_pool,
+        p_tg_id: TG_ID
+      });
+      loading(false);
+      showView('view-agent-dash'); loadAgentDash();
+    } catch (err) { fail(err, "Could not register agent"); }
   });
 
   async function loadAgentDash() {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/agents?telegram_id=eq.${TG_ID}`, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } });
-    const data = await res.json();
-    if (data.length > 0) document.getElementById('agentEarnings').textContent = data[0].total_earnings;
+    if (!TG_ID) return;
+    try {
+      const data = await api(`agents?telegram_id=eq.${TG_ID}`) || [];
+      if (data.length > 0) document.getElementById('agentEarnings').textContent = data[0].total_earnings ?? 0;
+    } catch (e) { console.error(e); }
 
-    // FETCH VIA SECURE RPC
-    const leads = await rpc('get_agent_candidates', { p_agent_tg_id: TG_ID });
-    
-    document.getElementById('agentCount').textContent = `${leads.length} Total`;
+    const list = document.getElementById('agentLeadsList');
+    try {
+      const leads = await rpc('get_agent_candidates', { p_agent_tg_id: TG_ID });
+      document.getElementById('agentCount').textContent = `${leads.length} Total`;
 
-    if (leads.length === 0) {
-      document.getElementById('agentLeadsList').innerHTML = `<div class="card p-8 text-center border-dashed border-gold/30 bg-gold/5"><p class="text-sm font-bold text-gold mb-1">No Candidates Yet</p><p class="text-xs text-slate-400 mb-4">Upload your first candidate to start earning $1 per unlock.</p><button onclick="showView('view-agent-add')" class="bg-gold text-navy font-extrabold px-4 py-2 rounded-lg text-xs">Add Candidate</button></div>`;
-      return;
-    }
+      if (leads.length === 0) {
+        list.innerHTML = `<div class="card p-8 text-center border-dashed border-gold/30 bg-gold/5"><p class="text-sm font-bold text-gold mb-1">No Candidates Yet</p><p class="text-xs text-slate-400 mb-4">Upload your first candidate to start earning $1 per unlock.</p><button onclick="showView('view-agent-add')" class="bg-gold text-navy font-extrabold px-4 py-2 rounded-lg text-xs">Add Candidate</button></div>`;
+        return;
+      }
 
-    document.getElementById('agentLeadsList').innerHTML = leads.map(l => `
-      <div class="card p-4 bg-navysoft/50">
-        <div class="flex justify-between items-start mb-2">
-          <div>
-            <p class="font-bold text-[13.5px]">${escapeHTML(l.name)}</p>
-            <p class="text-[11px] text-slate-400">${escapeHTML(l.job)} · ${escapeHTML(l.qualification)}</p>
+      list.innerHTML = leads.map(l => `
+        <div class="card p-4 bg-navysoft/50">
+          <div class="flex justify-between items-start mb-2">
+            <div>
+              <p class="font-bold text-[13.5px]">${escapeHTML(l.name)}</p>
+              <p class="text-[11px] text-slate-400">${escapeHTML(l.job)} · ${escapeHTML(l.qualification)}</p>
+            </div>
+            <span class="text-[9px] font-extrabold px-2 py-1 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">${escapeHTML((l.status || 'pending').toUpperCase())}</span>
           </div>
-          <span class="text-[9px] font-extrabold px-2 py-1 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">${(l.status || 'pending').toUpperCase()}</span>
+          <p class="text-[11px] text-slate-500 mt-2 font-mono">📞 ${escapeHTML(l.phone)}</p>
         </div>
-        <p class="text-[11px] text-slate-500 mt-2 font-mono">📞 ${escapeHTML(l.phone)}</p>
-      </div>
-    `).join('');
+      `).join('');
+    } catch (e) {
+      console.error(e);
+      list.innerHTML = `<div class="card p-6 text-center border-dashed border-white/20 bg-transparent"><p class="text-xs text-slate-500">Could not load your candidates. Please reopen the app.</p></div>`;
+    }
   }
 
   document.getElementById('agentAddForm').addEventListener('submit', async (e) => {
-    e.preventDefault(); loading(true);
-    const data = Object.fromEntries(new FormData(e.target).entries());
-    data.location = 'Nigeria';
-    
-    // SAVE VIA SECURE RPC
-    await rpc('agent_add_candidate', { 
-      p_agent_tg_id: TG_ID, 
-      p_name: data.name, 
-      p_phone: data.phone, 
-      p_email: data.email, 
-      p_job: data.job, 
-      p_qualification: data.qualification, 
-      p_experience: data.experience, 
-      p_cv: data.cv 
-    });
-    
-    loading(false); showView('view-agent-dash'); loadAgentDash();
+    e.preventDefault();
+    if (needTelegram()) return;
+    loading(true);
+    try {
+      const data = clean(Object.fromEntries(new FormData(e.target).entries()));
+      await rpc('agent_add_candidate', {
+        p_agent_tg_id: TG_ID,
+        p_name: data.name,
+        p_phone: data.phone,
+        p_email: data.email,
+        p_job: data.job,
+        p_qualification: data.qualification,
+        p_experience: data.experience,
+        p_cv: data.cv
+      });
+      loading(false);
+      e.target.reset();
+      showView('view-agent-dash'); loadAgentDash();
+    } catch (err) { fail(err, "Could not add candidate"); }
   });
 
   document.getElementById('agentProfileForm').addEventListener('submit', async (e) => {
-    e.preventDefault(); loading(true);
-    const data = Object.fromEntries(new FormData(e.target).entries());
-    await fetch(`${SUPABASE_URL}/rest/v1/agents?telegram_id=eq.${TG_ID}`, { method: 'PATCH', headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
-    loading(false); alert("Payout details saved!"); showView('view-agent-dash');
+    e.preventDefault();
+    if (needTelegram()) return;
+    loading(true);
+    try {
+      const data = clean(Object.fromEntries(new FormData(e.target).entries()));
+      await patchRow(`agents?telegram_id=eq.${TG_ID}`, data);
+      loading(false); alert("Payout details saved!"); showView('view-agent-dash');
+    } catch (err) { fail(err, "Could not save payout details"); }
   });
 
-  // --- SOURCER LOGIC ---
+  // ---------- SOURCER ----------
   document.getElementById('sourcerRegForm').addEventListener('submit', async (e) => {
-    e.preventDefault(); loading(true);
-    const data = Object.fromEntries(new FormData(e.target).entries());
-    
+    e.preventDefault();
+    if (needTelegram()) return;
+    loading(true);
     try {
-      // SAVE VIA SECURE RPC (Waits for database to confirm the code was generated)
-      await rpc('create_sourcer_profile', { 
-        p_name: data.name, 
-        p_email: data.email, 
-        p_phone: data.phone, 
-        p_address: data.address, 
-        p_traffic_source: data.traffic_source, 
-        p_tg_id: TG_ID 
+      const data = clean(Object.fromEntries(new FormData(e.target).entries()));
+      await rpc('create_sourcer_profile', {
+        p_name: data.name,
+        p_email: data.email,
+        p_phone: data.phone,
+        p_address: data.address,
+        p_traffic_source: data.traffic_source,
+        p_tg_id: TG_ID
       });
-      
       loading(false); showView('view-sourcer-dash'); loadSourcerDash();
-    } catch(err) {
-      loading(false);
-      alert("Database error. Please ensure SQL policies are set.");
-    }
+    } catch (err) { fail(err, "Could not register sourcer"); }
   });
 
   async function loadSourcerDash() {
-    // FETCH VIA SECURE RPC
-    const data = await rpc('get_sourcer_profile', { p_tg_id: TG_ID });
-    
-    if (data && data.length > 0) {
-      document.getElementById('sourcerEarnings').textContent = data[0].total_earnings;
-      document.getElementById('refLink').textContent = `t.me/WorldBridgeBot/apply?startapp=ref_${data[0].referral_code}`;
-    }
+    if (!TG_ID) return;
+    try {
+      const data = await rpc('get_sourcer_profile', { p_tg_id: TG_ID });
+      if (data && data.length > 0) {
+        document.getElementById('sourcerEarnings').textContent = data[0].total_earnings ?? 0;
+        document.getElementById('refLink').textContent = `t.me/WorldBridgeBot/apply?startapp=ref_${data[0].referral_code}`;
+      }
+    } catch (e) { console.error(e); }
 
-    // FETCH VIA SECURE RPC
-    const leads = await rpc('get_sourcer_referrals', { p_sourcer_tg_id: TG_ID });
-    
-    document.getElementById('sourcerCount').textContent = `${leads.length} Referrals`;
+    const list = document.getElementById('sourcerLeadsList');
+    try {
+      const leads = await rpc('get_sourcer_referrals', { p_sourcer_tg_id: TG_ID });
+      document.getElementById('sourcerCount').textContent = `${leads.length} Referrals`;
 
-    if (leads.length === 0) {
-      document.getElementById('sourcerLeadsList').innerHTML = `<div class="card p-8 text-center border-dashed border-white/20 bg-transparent"><p class="text-sm font-bold text-slate-300 mb-1">No Referrals Yet</p><p class="text-xs text-slate-500 mb-4">Share your unique link with workers. When a recruiter unlocks them, you earn $3.</p><button onclick="copyRefLink()" class="bg-white/10 text-white font-bold px-4 py-2 rounded-lg text-xs border border-white/10">Copy My Link</button></div>`;
-      return;
-    }
+      if (leads.length === 0) {
+        list.innerHTML = `<div class="card p-8 text-center border-dashed border-white/20 bg-transparent"><p class="text-sm font-bold text-slate-300 mb-1">No Referrals Yet</p><p class="text-xs text-slate-500 mb-4">Share your unique link with workers. When a recruiter unlocks them, you earn $3.</p><button onclick="copyRefLink()" class="bg-white/10 text-white font-bold px-4 py-2 rounded-lg text-xs border border-white/10">Copy My Link</button></div>`;
+        return;
+      }
 
-    document.getElementById('sourcerLeadsList').innerHTML = leads.map(l => `
-      <div class="card p-4 bg-navysoft/50">
-        <div class="flex justify-between items-start">
-          <div>
-            <p class="font-bold text-[13.5px]">${escapeHTML(l.name)}</p>
-            <p class="text-[11px] text-slate-400">${escapeHTML(l.job)} · ${escapeHTML(l.location || 'Nigeria')}</p>
+      list.innerHTML = leads.map(l => `
+        <div class="card p-4 bg-navysoft/50">
+          <div class="flex justify-between items-start">
+            <div>
+              <p class="font-bold text-[13.5px]">${escapeHTML(l.name)}</p>
+              <p class="text-[11px] text-slate-400">${escapeHTML(l.job)} · ${escapeHTML(l.location || 'Nigeria')}</p>
+            </div>
+            <span class="text-[9px] font-extrabold px-2 py-1 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">${l.passport ? 'PASSPORT ✓' : 'REFERRED'}</span>
           </div>
-          <span class="text-[9px] font-extrabold px-2 py-1 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">${l.passport ? 'PASSPORT ✓' : 'REFERRED'}</span>
         </div>
-      </div>
-    `).join('');
+      `).join('');
+    } catch (e) {
+      console.error(e);
+      list.innerHTML = `<div class="card p-6 text-center border-dashed border-white/20 bg-transparent"><p class="text-xs text-slate-500">Could not load referrals. Please reopen the app.</p></div>`;
+    }
   }
 
   function copyRefLink() {
     const link = document.getElementById('refLink').textContent;
-    navigator.clipboard.writeText(link).then(() => {
-      alert('Referral link copied to clipboard!');
-    });
+    if (!link || link === 'Loading...') return;
+    const done = () => alert('Referral link copied to clipboard!');
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(link).then(done).catch(() => fallbackCopy(link, done));
+    } else fallbackCopy(link, done);
+  }
+  function fallbackCopy(text, done) {
+    const ta = document.createElement('textarea');
+    ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); done(); } catch (e) { alert(text); }
+    document.body.removeChild(ta);
   }
 
   document.getElementById('sourcerProfileForm').addEventListener('submit', async (e) => {
-    e.preventDefault(); loading(true);
-    const data = Object.fromEntries(new FormData(e.target).entries());
-    await fetch(`${SUPABASE_URL}/rest/v1/sourcers?telegram_id=eq.${TG_ID}`, { method: 'PATCH', headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
-    loading(false); alert("Payout details saved!"); showView('view-sourcer-dash');
+    e.preventDefault();
+    if (needTelegram()) return;
+    loading(true);
+    try {
+      const data = clean(Object.fromEntries(new FormData(e.target).entries()));
+      await patchRow(`sourcers?telegram_id=eq.${TG_ID}`, data);
+      loading(false); alert("Payout details saved!"); showView('view-sourcer-dash');
+    } catch (err) { fail(err, "Could not save payout details"); }
   });
 
   // INIT
