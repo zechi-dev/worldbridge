@@ -170,12 +170,23 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
       </div>
     </header>
     <div class="max-w-md mx-auto px-4 py-5 pb-24">
+      <div class="flex gap-2 mb-4">
+        <button id="tabLeads" onclick="showRecruiterTab('leads')" class="flex-1 font-extrabold py-2.5 rounded-xl text-xs bg-gold text-navy">Find Leads</button>
+        <button id="tabUnlocked" onclick="showRecruiterTab('unlocked')" class="flex-1 font-extrabold py-2.5 rounded-xl text-xs bg-white/5 border border-white/10 text-white">My Unlocked<span id="unlockedCount"></span></button>
+        <button onclick="openSupport()" class="shrink-0 bg-white/5 border border-white/10 text-white font-extrabold py-2.5 px-4 rounded-xl text-xs">💬<span id="supportBadge" class="hidden ml-1 bg-gold text-navy rounded-full px-1.5 text-[10px] font-extrabold"></span></button>
+      </div>
+      <div id="recruiterLeadsPane">
       <div class="flex gap-2 mb-5">
         <input type="text" id="searchJob" placeholder="🔍 Search Job..." class="input text-xs bg-white/5" oninput="debouncedLoadLeads()">
         <input type="text" id="searchQual" placeholder="🎓 Qualification..." class="input text-xs bg-white/5" oninput="debouncedLoadLeads()">
       </div>
       <h2 class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-3">Available Leads</h2>
       <div id="recruiterLeadsList" class="space-y-3"></div>
+      </div>
+      <div id="recruiterUnlockedPane" class="hidden">
+        <h2 class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-3">Your Unlocked Leads</h2>
+        <div id="recruiterUnlockedList" class="space-y-3"></div>
+      </div>
     </div>
     <div id="cartBanner" class="fixed bottom-0 inset-x-0 p-4 bg-navysoft border-t border-gold/30 hidden z-40 shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
       <div class="max-w-md mx-auto flex items-center justify-between">
@@ -328,6 +339,21 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
         <div class="card p-4 bg-navysoft"><label class="label">USDT Wallet Address (TRC-20)</label><input class="input" name="wallet_address" placeholder="T..."></div>
         <button type="submit" class="btn mt-2">Save Payout Details</button>
       </form>
+    </div>
+  </section>
+
+  <!-- SUPPORT CHAT (recruiter <-> admin) -->
+  <section id="view-support" class="view hidden bg-navy">
+    <header class="sticky top-0 z-30 bg-navy/95 backdrop-blur-md border-b border-white/10 p-4 flex items-center gap-3">
+      <button onclick="showView('view-recruiter-dash')" class="text-slate-400 text-sm">← Back</button>
+      <div><h1 class="font-extrabold text-[16px]">Message Admin</h1><p class="text-[10px] text-slate-400">We reply to you here</p></div>
+    </header>
+    <div class="max-w-md mx-auto px-4 py-4" style="padding-bottom:110px"><div id="supportList" class="space-y-2"></div></div>
+    <div class="fixed bottom-0 inset-x-0 px-3 pt-3 bg-navysoft border-t border-white/10 z-40" style="padding-bottom:calc(0.75rem + env(safe-area-inset-bottom))">
+      <div class="max-w-md mx-auto flex gap-2">
+        <input id="supportInput" class="input text-sm" placeholder="Type your message..." maxlength="1000">
+        <button onclick="sendSupport()" class="bg-gold text-navy font-extrabold px-5 rounded-xl text-sm active:scale-95 transition">Send</button>
+      </div>
     </div>
   </section>
 
@@ -581,7 +607,8 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
 
     const box = document.getElementById('recruiterLeadsList');
     try {
-      const leads = await api(path) || [];
+      if (!unlockedLoaded) { await fetchUnlocked(); refreshSupportBadge(); }
+      const leads = (await api(path) || []).filter(l => !unlockedIds.has(String(l.id)));
       if (leads.length === 0) {
         box.innerHTML = `<div class="card p-6 text-center border-dashed border-white/20 bg-transparent"><p class="text-xs text-slate-500">No candidates found matching your search.</p></div>`;
         return;
@@ -590,8 +617,9 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
         <div class="card p-4 flex gap-3 items-center bg-navysoft/50">
           <input type="checkbox" value="${escapeHTML(l.id)}" ${cart.includes(String(l.id)) ? 'checked' : ''} onchange="toggleCart(this)" class="w-5 h-5 accent-gold rounded cursor-pointer">
           <div class="flex-1 cursor-pointer" onclick="this.parentElement.querySelector('input').click()">
-            <p class="font-bold text-[13.5px]">${escapeHTML(l.name_masked)}</p>
+            <p class="font-bold text-[13.5px]">${escapeHTML(l.name || l.name_masked)}</p>
             <p class="text-[11px] text-slate-400">${escapeHTML(l.job)} · ${escapeHTML(l.qualification)} · ${escapeHTML(l.experience)}</p>
+            ${(l.masked_phone || l.masked_email) ? `<p class="text-[10.5px] text-slate-500 mt-0.5 font-mono">${l.masked_phone ? '📞 ' + escapeHTML(l.masked_phone) : ''} ${l.masked_email ? '✉️ ' + escapeHTML(l.masked_email) : ''}</p>` : ''}
           </div>
           <div class="text-emerald-400 text-[9px] font-extrabold tracking-wider px-2 py-1 bg-emerald-500/10 rounded border border-emerald-500/20">${l.passport ? 'PASSPORT ✓' : 'NO PP'}</div>
         </div>
@@ -830,6 +858,125 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
       loading(false); alert("Payout details saved!"); showView('view-sourcer-dash');
     } catch (err) { fail(err, "Could not save payout details"); }
   });
+
+  // ---------- RECRUITER: UNLOCKED LEADS + MESSAGES ----------
+  let unlockedIds = new Set();
+  let unlockedLoaded = false;
+  let supportTimer = null;
+  let lastSupportCount = -1;
+
+  async function fetchUnlocked() {
+    let items = [];
+    try {
+      items = await rpc('get_my_unlocked_leads', { p_tg_id: TG_ID });
+      unlockedIds = new Set(items.map(l => String(l.id)));
+    } catch (e) { console.error(e); }
+    unlockedLoaded = true;
+    return items;
+  }
+
+  function waLink(phone) {
+    let d = String(phone || '').replace(/\D/g, '');
+    if (!d) return '';
+    if (d.length === 11 && d.startsWith('0')) d = '234' + d.slice(1); // Nigerian local format
+    return `https://wa.me/${d}`;
+  }
+
+  async function showRecruiterTab(tab) {
+    const isLeads = tab === 'leads';
+    document.getElementById('recruiterLeadsPane').classList.toggle('hidden', !isLeads);
+    document.getElementById('recruiterUnlockedPane').classList.toggle('hidden', isLeads);
+    const base = 'font-extrabold py-2.5 rounded-xl text-xs ';
+    const on = base + 'flex-1 bg-gold text-navy';
+    const off = base + 'flex-1 bg-white/5 border border-white/10 text-white';
+    document.getElementById('tabLeads').className = isLeads ? on : off;
+    document.getElementById('tabUnlocked').className = isLeads ? off : on;
+    if (isLeads) { loadRecruiterLeads(); return; }
+
+    const box = document.getElementById('recruiterUnlockedList');
+    box.innerHTML = `<div class="card p-6 text-center border-dashed border-white/20 bg-transparent"><p class="text-xs text-slate-500">Loading...</p></div>`;
+    const items = await fetchUnlocked();
+    document.getElementById('unlockedCount').textContent = items.length ? ` (${items.length})` : '';
+    if (items.length === 0) {
+      box.innerHTML = `<div class="card p-6 text-center border-dashed border-white/20 bg-transparent"><p class="text-xs text-slate-500">No unlocked leads yet. Leads appear here once your payment is confirmed.</p></div>`;
+      return;
+    }
+    box.innerHTML = items.map(l => {
+      const wa = waLink(l.phone);
+      const cv = safeUrl(l.cv);
+      return `
+      <div class="card p-4 bg-navysoft/50">
+        <p class="font-bold text-[14px]">${escapeHTML(l.name)}</p>
+        <p class="text-[11px] text-slate-400">${escapeHTML(l.job)} · ${escapeHTML(l.qualification)} · ${escapeHTML(l.experience)}</p>
+        <div class="mt-3 space-y-1.5 text-[12px]">
+          <p>📞 ${wa ? `<a href="${escapeHTML(wa)}" target="_blank" rel="noopener" class="text-gold underline font-semibold">${escapeHTML(l.phone)}</a>` : escapeHTML(l.phone)}</p>
+          ${l.email ? `<p>✉️ ${escapeHTML(l.email)}</p>` : ''}
+          ${cv ? `<p><a href="${escapeHTML(cv)}" target="_blank" rel="noopener" class="text-gold underline font-semibold">📄 View CV</a></p>` : ''}
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  async function refreshSupportBadge() {
+    const el = document.getElementById('supportBadge');
+    if (!TG_ID || !el) return;
+    try {
+      const msgs = await rpc('get_support_messages', { p_tg_id: TG_ID });
+      const n = msgs.filter(m => m.sender === 'admin' && !m.is_read).length;
+      el.textContent = n ? String(n) : '';
+      el.classList.toggle('hidden', !n);
+    } catch (e) { console.error(e); }
+  }
+
+  function openSupport() {
+    if (needTelegram()) return;
+    showView('view-support');
+    lastSupportCount = -1;
+    loadSupport();
+    if (!supportTimer) {
+      supportTimer = setInterval(() => {
+        if (!document.getElementById('view-support').classList.contains('hidden')) loadSupport();
+      }, 15000);
+    }
+  }
+
+  async function loadSupport() {
+    const box = document.getElementById('supportList');
+    try {
+      const msgs = await rpc('get_support_messages', { p_tg_id: TG_ID });
+      if (msgs.length === 0) {
+        box.innerHTML = `<div class="card p-6 text-center border-dashed border-white/20 bg-transparent"><p class="text-xs text-slate-500">Send us a message. We reply here.</p></div>`;
+        return;
+      }
+      box.innerHTML = msgs.map(m => {
+        const mine = m.sender !== 'admin';
+        const time = m.created_at ? new Date(m.created_at).toLocaleString() : '';
+        return `<div class="flex ${mine ? 'justify-end' : 'justify-start'}">
+          <div class="max-w-[80%] rounded-2xl px-3.5 py-2.5 ${mine ? 'bg-gold/20 border border-gold/30' : 'bg-white/5 border border-white/10'}">
+            ${mine ? '' : '<p class="text-[10px] font-extrabold text-gold mb-0.5">Admin</p>'}
+            <p class="text-[13px] whitespace-pre-wrap break-words">${escapeHTML(m.message)}</p>
+            <p class="text-[9px] text-slate-500 mt-1">${escapeHTML(time)}</p>
+          </div></div>`;
+      }).join('');
+      if (msgs.length !== lastSupportCount) { lastSupportCount = msgs.length; window.scrollTo(0, document.body.scrollHeight); }
+      if (msgs.some(m => m.sender === 'admin' && !m.is_read)) {
+        await rpc('mark_support_read', { p_tg_id: TG_ID });
+        const el = document.getElementById('supportBadge'); if (el) { el.textContent = ''; el.classList.add('hidden'); }
+      }
+    } catch (e) { console.error(e); }
+  }
+
+  async function sendSupport() {
+    const input = document.getElementById('supportInput');
+    const text = input.value.trim();
+    if (!text) return;
+    if (needTelegram()) return;
+    input.value = '';
+    try {
+      await rpc('send_support_message', { p_tg_id: TG_ID, p_message: text });
+      await loadSupport();
+    } catch (e) { input.value = text; fail(e, "Could not send message"); }
+  }
 
   // ---------- NOTIFICATIONS ----------
   // Shows recruiter-interest alerts. Returns { leadId: recruiterName } for tracking purchases.
