@@ -1,22 +1,873 @@
-create or replace function attach_referral(p_worker_tg_id bigint, p_code text)
-returns text
-language plpgsql security definer set search_path = public
-as $$
-declare s bigint;
-begin
-  select telegram_id into s from sourcers
-    where upper(referral_code) = upper(p_code) limit 1;
-  if s is null then return 'bad_code'; end if;
-  if s = p_worker_tg_id then return 'self'; end if;
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#0F172A">
+<title>WorldBridge — Dubai &amp; Gulf Jobs</title>
 
-  update gulf_leads set referred_by_sourcer_tg_id = s::text
-  where telegram_id::text = p_worker_tg_id::text
-    and (referred_by_sourcer_tg_id is null or referred_by_sourcer_tg_id::text = '');
-  if found then return 'attached'; end if;
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
-  if exists (select 1 from gulf_leads where telegram_id::text = p_worker_tg_id::text)
-    then return 'already'; end if;
-  return 'no_worker';
-end $$;
+<script>
+tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B',gold:'#F59E0B'}, fontFamily:{sans:['Inter','ui-sans-serif','system-ui','sans-serif']} } } };
+</script>
 
-grant execute on function attach_referral(bigint, text) to anon, authenticated;
+<style type="text/tailwindcss">
+  @layer components {
+    .label { @apply block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5; }
+    .input { @apply w-full rounded-xl bg-white/5 border border-white/10 px-4 py-3 text-sm text-white placeholder-slate-500 outline-none transition focus:border-gold focus:bg-white/[0.07] focus:ring-2 focus:ring-gold/20; }
+    .select { @apply w-full rounded-xl bg-white/5 border border-white/10 px-4 py-3 text-sm text-white outline-none transition appearance-none pr-10 focus:border-gold focus:bg-white/[0.07] focus:ring-2 focus:ring-gold/20; background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394A3B8' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='m19 9-7 7-7-7'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 0.85rem center; background-size: 1rem; }
+    .card { @apply rounded-2xl bg-white/5 border border-white/10; }
+    .btn { @apply w-full rounded-2xl bg-gold text-navy font-extrabold text-[15px] py-4 active:scale-[0.98] transition; }
+  }
+</style>
+
+<style>
+  html, body { -webkit-tap-highlight-color: transparent; }
+  body { overscroll-behavior-y: none; }
+  select option { color: #0F172A; background: #FFFFFF; }
+  .spinner { width:18px; height:18px; border:2.5px solid rgba(15,23,42,.25); border-top-color:#0F172A; border-radius:50%; animation: spin .7s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .fade-in { animation: fadeIn .35s ease both; }
+  @keyframes fadeIn { from { opacity:0; transform: translateY(8px);} to { opacity:1; transform:translateY(0);} }
+  .safe-bottom { padding-bottom: calc(1.5rem + env(safe-area-inset-bottom)); }
+</style>
+</head>
+
+<body class="bg-navy text-white font-sans antialiased selection:bg-gold selection:text-navy">
+<div class="min-h-screen w-full">
+
+  <!-- VIEW 0 — MAIN HOME -->
+  <section id="view-role" class="view">
+    <header class="sticky top-0 z-30 bg-navy/85 backdrop-blur-xl border-b border-white/10">
+      <div class="max-w-md mx-auto px-5 py-3 flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-gold flex items-center justify-center text-navy font-black text-lg shadow-lg shadow-gold/20">W</div>
+          <div class="leading-tight">
+            <p class="font-extrabold tracking-tight text-[15px]">WorldBridge</p>
+            <p class="text-[9px] text-gold font-bold tracking-[0.18em] uppercase">Dubai · UAE · Gulf</p>
+          </div>
+        </div>
+        <span class="text-[10px] font-extrabold px-2.5 py-1 rounded-full bg-gold/15 text-gold border border-gold/30">FREE</span>
+      </div>
+    </header>
+
+    <div class="max-w-md mx-auto px-5">
+      <div class="pt-8">
+        <div class="inline-flex items-center gap-2 rounded-full bg-white/5 border border-white/10 px-3 py-1.5">
+          <span class="w-1.5 h-1.5 rounded-full bg-gold animate-pulse"></span>
+          <span class="text-[11px] font-extrabold tracking-widest uppercase text-gold">Employer Pays</span>
+        </div>
+        <h1 class="mt-4 text-[34px] leading-[1.1] font-extrabold tracking-tight">Your Gateway to<br><span class="text-gold">Dubai &amp; Gulf</span> Jobs</h1>
+        <p class="mt-3.5 text-[13.5px] leading-relaxed text-slate-300">Verified Gulf employers. <span class="text-white font-semibold">Zero placement fees.</span> Free visa, accommodation and flight ticket — the employer pays, not you.</p>
+      </div>
+
+      <div class="mt-9">
+        <div class="flex items-end justify-between mb-3">
+          <h2 class="text-sm font-extrabold tracking-tight">Open Roles</h2>
+          <span class="text-[10.5px] font-semibold text-gold">Visa · Accommodation · Ticket</span>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div class="card overflow-hidden"><img src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=500&q=70" class="h-24 w-full object-cover"><div class="p-3"><p class="text-[13px] font-extrabold">Caregiver</p><p class="text-[10.5px] text-slate-400 mt-0.5">Homes &amp; Clinics</p></div></div>
+          <div class="card overflow-hidden"><img src="https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?auto=format&fit=crop&w=500&q=70" class="h-24 w-full object-cover"><div class="p-3"><p class="text-[13px] font-extrabold">Driver</p><p class="text-[10.5px] text-slate-400 mt-0.5">Light &amp; Heavy</p></div></div>
+          <div class="card overflow-hidden"><img src="https://images.unsplash.com/photo-1590650153855-d9e808231d41?auto=format&fit=crop&w=500&q=70" class="h-24 w-full object-cover"><div class="p-3"><p class="text-[13px] font-extrabold">Security</p><p class="text-[10.5px] text-slate-400 mt-0.5">Guard &amp; CCTV</p></div></div>
+          <div class="card overflow-hidden"><img src="https://images.unsplash.com/photo-1553413077-190dd305871c?auto=format&fit=crop&w=500&q=70" class="h-24 w-full object-cover"><div class="p-3"><p class="text-[13px] font-extrabold">Warehouse</p><p class="text-[10.5px] text-slate-400 mt-0.5">Factory &amp; Logistics</p></div></div>
+        </div>
+      </div>
+
+      <div class="mt-10 mb-6">
+        <h2 class="text-[18px] font-extrabold tracking-tight text-center mb-4">How will you use <span class="text-gold">WorldBridge?</span></h2>
+        <div class="space-y-3">
+          <button onclick="selectRole('worker')" class="w-full text-left card p-4 flex items-center gap-4 active:scale-[0.98] transition hover:border-gold/40">
+            <div class="w-12 h-12 rounded-xl bg-gold/15 border border-gold/25 flex items-center justify-center shrink-0 text-gold text-xl font-black">👷</div>
+            <div class="flex-1"><p class="font-extrabold text-[15px]">I'm a Worker</p><p class="text-[11.5px] text-slate-400">Apply for jobs in Dubai &amp; the Gulf. Free.</p></div>
+          </button>
+          <button onclick="selectRole('recruiter')" class="w-full text-left card p-4 flex items-center gap-4 active:scale-[0.98] transition hover:border-gold/40">
+            <div class="w-12 h-12 rounded-xl bg-gold/15 border border-gold/25 flex items-center justify-center shrink-0 text-gold text-xl font-black">🏢</div>
+            <div class="flex-1"><p class="font-extrabold text-[15px]">I'm a Recruitment Office</p><p class="text-[11.5px] text-slate-400">Browse verified worker leads. Pay per unlock.</p></div>
+          </button>
+          <button onclick="selectRole('agent')" class="w-full text-left card p-4 flex items-center gap-4 active:scale-[0.98] transition hover:border-gold/40">
+            <div class="w-12 h-12 rounded-xl bg-gold/15 border border-gold/25 flex items-center justify-center shrink-0 text-gold text-xl font-black">🤝</div>
+            <div class="flex-1"><p class="font-extrabold text-[15px]">I'm an Agent</p><p class="text-[11.5px] text-slate-400">Upload candidates. Earn $1 per unlock.</p></div>
+          </button>
+          <button onclick="selectRole('sourcer')" class="w-full text-left card p-4 flex items-center gap-4 active:scale-[0.98] transition hover:border-gold/40">
+            <div class="w-12 h-12 rounded-xl bg-gold/15 border border-gold/25 flex items-center justify-center shrink-0 text-gold text-xl font-black">🔗</div>
+            <div class="flex-1"><p class="font-extrabold text-[15px]">I'm a Sourcer</p><p class="text-[11.5px] text-slate-400">Refer friends. Earn $3 per unlock.</p></div>
+          </button>
+        </div>
+      </div>
+      <div class="mb-8"><p class="text-center text-[10px] text-slate-500">WorldBridge Manpower Consultancy · Dubai, UAE</p></div>
+    </div>
+  </section>
+
+  <!-- WORKER VIEWS -->
+  <section id="view-worker-reg" class="view hidden">
+    <div class="max-w-md mx-auto px-5 pt-8 safe-bottom">
+      <button onclick="showView('view-role')" class="mb-4 text-slate-400 text-sm">← Back</button>
+      <h2 class="text-xl font-extrabold mb-4">Worker Registration</h2>
+      <form id="workerForm" class="space-y-4">
+        <input class="input" name="name" placeholder="Full Name" required>
+        <input class="input" name="phone" type="tel" placeholder="WhatsApp Number" required>
+        <input class="input" name="email" type="email" placeholder="Email (Optional)">
+        <select class="input text-white bg-navy" name="job" required><option value="">Select Job...</option><option>Caregiver</option><option>Driver</option><option>Security</option><option>Factory</option><option>Warehouse</option></select>
+        <select class="input text-white bg-navy" name="qualification" required><option value="">Qualification...</option><option>SSCE</option><option>OND</option><option>HND/BSc</option><option>Trade Cert</option></select>
+        <select class="input text-white bg-navy" name="experience" required><option value="">Experience...</option><option>None</option><option>1-2 Years</option><option>3-5 Years</option></select>
+        <input class="input" name="cv" placeholder="CV Link (Google Drive)">
+        <button type="submit" class="btn">Submit Application</button>
+      </form>
+    </div>
+  </section>
+
+  <section id="view-worker-dash" class="view hidden bg-navy">
+    <header class="p-4 border-b border-white/10 flex justify-between items-center bg-navy/95 backdrop-blur-md sticky top-0 z-30">
+      <div><h1 class="font-extrabold text-[16px]">Worker Dashboard</h1><p class="text-[10px] text-emerald-400 font-bold tracking-wider uppercase">Active Candidate</p></div>
+    </header>
+    <div class="max-w-md mx-auto p-5 space-y-5">
+      <div class="card p-5 border-l-4 border-gold bg-gradient-to-r from-gold/5 to-transparent">
+        <h2 class="font-bold text-[14px] mb-1">My CV / Resume</h2>
+        <p class="text-[11px] text-slate-400 mb-3">Recruiters need your CV to schedule interviews.</p>
+        <div class="flex gap-2">
+          <input type="text" id="workerCvUpdate" class="input text-xs" placeholder="Paste Google Drive link...">
+          <button onclick="updateWorkerCv()" class="bg-gold text-navy font-bold px-4 rounded-xl text-xs active:scale-95 transition">Save</button>
+        </div>
+        <p id="cvStatus" class="text-[10px] text-slate-500 mt-2 font-medium">No CV uploaded yet.</p>
+      </div>
+      <div>
+        <h2 class="font-bold text-[14px] mb-3">Notifications</h2>
+        <div class="card p-6 text-center border-dashed border-white/20 bg-transparent">
+          <div id="workerNotifs"><p class="text-xs text-slate-500">No new interview invites or requests yet.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- RECRUITER VIEWS -->
+  <section id="view-recruiter-reg" class="view hidden">
+    <div class="max-w-md mx-auto px-5 pt-8 safe-bottom">
+      <button onclick="showView('view-role')" class="mb-4 text-slate-400 text-sm">← Back</button>
+      <h2 class="text-xl font-extrabold mb-4">Recruiter Registration</h2>
+      <form id="recruiterForm" class="space-y-4">
+        <input class="input" name="company_name" placeholder="Company Name" required>
+        <input class="input" name="email" type="email" placeholder="Email">
+        <input class="input" name="phone" type="tel" placeholder="WhatsApp Number" required>
+        <input class="input" name="office_address" placeholder="City / Office Address (Optional)">
+        <input class="input" name="license_number" placeholder="Trade License No. (Optional)">
+        <button type="submit" class="btn">Create Account</button>
+      </form>
+    </div>
+  </section>
+
+  <section id="view-recruiter-dash" class="view hidden bg-navy">
+    <header class="sticky top-0 z-30 bg-navy/95 backdrop-blur-md border-b border-white/10 p-4 flex justify-between items-center">
+      <div>
+        <h1 class="font-extrabold text-[16px]">Welcome, <span id="recruiterNameDisplay" class="text-gold">Recruiter</span></h1>
+        <p class="text-[10px] text-slate-400 font-bold tracking-wider uppercase">Talent Pool</p>
+      </div>
+    </header>
+    <div class="max-w-md mx-auto px-4 py-5 pb-24">
+      <div class="flex gap-2 mb-5">
+        <input type="text" id="searchJob" placeholder="🔍 Search Job..." class="input text-xs bg-white/5" oninput="debouncedLoadLeads()">
+        <input type="text" id="searchQual" placeholder="🎓 Qualification..." class="input text-xs bg-white/5" oninput="debouncedLoadLeads()">
+      </div>
+      <h2 class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-3">Available Leads</h2>
+      <div id="recruiterLeadsList" class="space-y-3"></div>
+    </div>
+    <div id="cartBanner" class="fixed bottom-0 inset-x-0 p-4 bg-navysoft border-t border-gold/30 hidden z-40 shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
+      <div class="max-w-md mx-auto flex items-center justify-between">
+        <div><p class="text-[10px] text-slate-400 uppercase font-bold">Selected</p><p class="font-extrabold text-gold text-lg" id="cartTotal">0 Leads</p></div>
+        <button onclick="checkoutCart()" class="bg-gold text-navy font-extrabold px-8 py-3 rounded-xl text-sm shadow-lg shadow-gold/20 active:scale-95 transition">Checkout</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="view-checkout" class="view hidden bg-navy">
+    <div class="max-w-md mx-auto px-5 py-10 text-center">
+      <h2 class="text-2xl font-extrabold mb-2">Complete Payment</h2>
+      <p class="text-slate-400 text-sm mb-8">Send the exact USDT amount below to unlock your selected leads.</p>
+      <div class="card p-6 mb-6 border-gold/30 bg-gradient-to-b from-gold/10 to-transparent">
+        <p class="text-[10px] text-slate-400 uppercase font-bold tracking-widest mb-1">Amount to Send</p>
+        <p class="text-4xl font-extrabold text-gold mb-1" id="checkoutAmount">0 USDT</p>
+        <p class="text-xs text-slate-500 font-bold mb-6">TRC-20 Network Only</p>
+        <div class="bg-white p-3 w-fit mx-auto rounded-xl mb-6 shadow-xl shadow-black/50"><img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=TNdv8vkaNdWYHPrHYuwuzjW6ivhHynr4vZ" width="160" height="160"></div>
+        <p class="text-[10px] text-slate-400 uppercase font-bold tracking-widest mb-1">Wallet Address</p>
+        <p class="text-[11px] font-mono text-white break-all bg-navy/50 p-3 rounded-lg border border-white/10">TNdv8vkaNdWYHPrHYuwuzjW6ivhHynr4vZ</p>
+      </div>
+      <button onclick="claimPayment()" class="btn shadow-xl shadow-gold/20">I've Sent the Payment</button>
+      <button onclick="showView('view-recruiter-dash')" class="mt-4 text-xs text-slate-400 font-bold">Cancel</button>
+    </div>
+  </section>
+
+  <!-- AGENT VIEWS -->
+  <section id="view-agent-reg" class="view hidden">
+    <div class="max-w-md mx-auto px-5 pt-8 safe-bottom">
+      <button onclick="showView('view-role')" class="mb-4 text-slate-400 text-sm">← Back</button>
+      <h2 class="text-xl font-extrabold mb-4">Agent Registration</h2>
+      <form id="agentRegForm" class="space-y-4">
+        <input class="input" name="name" placeholder="Full Name" required>
+        <input class="input" name="email" type="email" placeholder="Email">
+        <input class="input" name="phone" type="tel" placeholder="WhatsApp Number" required>
+        <input class="input" name="address" placeholder="Address">
+        <select class="input text-white bg-navy" name="candidate_pool"><option value="0-10">0 - 10 Candidates</option><option value="10-20">10 - 20 Candidates</option><option value="20+">20+ Candidates</option></select>
+        <button type="submit" class="btn">Register as Agent</button>
+      </form>
+    </div>
+  </section>
+
+  <section id="view-agent-dash" class="view hidden bg-navy">
+    <header class="sticky top-0 z-30 bg-navy/95 backdrop-blur-md border-b border-white/10 p-4 flex justify-between items-center">
+      <div><h1 class="font-extrabold text-[16px]">Agent Dashboard</h1><p class="text-[10px] text-gold font-bold tracking-wider uppercase">Total Earnings: $<span id="agentEarnings">0</span></p></div>
+    </header>
+    <div class="max-w-md mx-auto px-4 py-5">
+      <div id="agentNotifs" class="mb-5"></div>
+      <div class="flex gap-2 mb-6">
+        <button onclick="showView('view-agent-add')" class="flex-1 bg-gold text-navy font-extrabold py-3 rounded-xl text-xs shadow-lg shadow-gold/20 active:scale-95 transition">+ Add New Candidate</button>
+        <button onclick="showView('view-agent-profile')" class="flex-1 bg-white/5 border border-white/10 text-white font-extrabold py-3 rounded-xl text-xs active:scale-95 transition">Payout Settings</button>
+      </div>
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">My Candidates</h2>
+        <span class="text-[10px] text-slate-500 font-bold" id="agentCount">0 Total</span>
+      </div>
+      <div id="agentLeadsList" class="space-y-3"></div>
+    </div>
+  </section>
+
+  <section id="view-agent-add" class="view hidden bg-navy">
+    <div class="max-w-md mx-auto px-5 pt-6 safe-bottom">
+      <button onclick="showView('view-agent-dash')" class="mb-4 text-slate-400 text-sm">← Back to Dashboard</button>
+      <h2 class="text-xl font-extrabold mb-6">Upload New Candidate</h2>
+      <form id="agentAddForm" class="space-y-4">
+        <div class="card p-4 space-y-4 bg-navysoft">
+          <div><label class="label">Candidate Name</label><input class="input" name="name" placeholder="e.g. Musa Abdullahi" required></div>
+          <div><label class="label">WhatsApp Number</label><input class="input" name="phone" type="tel" placeholder="+234..." required></div>
+          <div><label class="label">Email (Optional)</label><input class="input" name="email" type="email" placeholder="musa@gmail.com"></div>
+        </div>
+        <div class="card p-4 space-y-4 bg-navysoft">
+          <div><label class="label">Job Category</label><select class="select text-white bg-navy" name="job" required><option value="">Select Job...</option><option>Caregiver</option><option>Driver</option><option>Security</option><option>Factory</option><option>Warehouse</option></select></div>
+          <div><label class="label">Qualification</label><select class="select text-white bg-navy" name="qualification" required><option value="">Select...</option><option>SSCE</option><option>OND</option><option>HND/BSc</option><option>Trade Cert</option></select></div>
+          <div><label class="label">Experience</label><select class="select text-white bg-navy" name="experience" required><option value="">Select...</option><option>None</option><option>1-2 Years</option><option>3-5 Years</option></select></div>
+        </div>
+        <div><label class="label">CV Link (Optional)</label><input class="input" name="cv" placeholder="Google Drive / Dropbox link"></div>
+        <button type="submit" class="btn mt-2">Submit Candidate</button>
+      </form>
+    </div>
+  </section>
+
+  <section id="view-agent-profile" class="view hidden bg-navy">
+    <div class="max-w-md mx-auto px-5 pt-6 safe-bottom">
+      <button onclick="showView('view-agent-dash')" class="mb-4 text-slate-400 text-sm">← Back to Dashboard</button>
+      <h2 class="text-xl font-extrabold mb-6">Payout Settings</h2>
+      <p class="text-xs text-slate-400 mb-4">Enter your bank details or USDT wallet to receive your $1 per unlock earnings.</p>
+      <form id="agentProfileForm" class="space-y-4">
+        <div class="card p-4 space-y-4 bg-navysoft">
+          <div><label class="label">Bank Name</label><input class="input" name="bank_name" placeholder="e.g. Access Bank"></div>
+          <div><label class="label">Account Number</label><input class="input" name="account_number" placeholder="0123456789"></div>
+          <div><label class="label">Account Name</label><input class="input" name="account_name" placeholder="John Doe"></div>
+        </div>
+        <div class="text-center text-[10px] text-slate-500 font-bold uppercase py-2">OR</div>
+        <div class="card p-4 bg-navysoft"><label class="label">USDT Wallet Address (TRC-20)</label><input class="input" name="wallet_address" placeholder="T..."></div>
+        <button type="submit" class="btn mt-2">Save Payout Details</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- SOURCER VIEWS -->
+  <section id="view-sourcer-reg" class="view hidden">
+    <div class="max-w-md mx-auto px-5 pt-8 safe-bottom">
+      <button onclick="showView('view-role')" class="mb-4 text-slate-400 text-sm">← Back</button>
+      <h2 class="text-xl font-extrabold mb-4">Sourcer Registration</h2>
+      <form id="sourcerRegForm" class="space-y-4">
+        <input class="input" name="name" placeholder="Full Name" required>
+        <input class="input" name="email" type="email" placeholder="Email">
+        <input class="input" name="phone" type="tel" placeholder="WhatsApp Number" required>
+        <input class="input" name="address" placeholder="Address">
+        <select class="input text-white bg-navy" name="traffic_source"><option value="Facebook">Facebook</option><option value="WhatsApp">WhatsApp</option><option value="Telegram">Telegram</option><option value="Other">Other</option></select>
+        <button type="submit" class="btn">Get Referral Link</button>
+      </form>
+    </div>
+  </section>
+
+  <section id="view-sourcer-dash" class="view hidden bg-navy">
+    <header class="sticky top-0 z-30 bg-navy/95 backdrop-blur-md border-b border-white/10 p-4 flex justify-between items-center">
+      <div><h1 class="font-extrabold text-[16px]">Sourcer Dashboard</h1><p class="text-[10px] text-emerald-400 font-bold tracking-wider uppercase">Total Earnings: $<span id="sourcerEarnings">0</span></p></div>
+    </header>
+    <div class="max-w-md mx-auto px-4 py-5">
+      <div id="sourcerNotifs" class="mb-5"></div>
+      <div class="card p-5 text-center mb-5 border-gold/30 bg-gradient-to-b from-gold/10 to-transparent">
+        <p class="text-[10px] text-slate-400 uppercase font-bold tracking-widest mb-2">Your Unique Referral Link</p>
+        <p class="text-[12px] font-mono text-gold break-all bg-navy/50 p-3 rounded-lg border border-gold/20 mb-3" id="refLink">Loading...</p>
+        <button onclick="copyRefLink()" class="bg-gold text-navy font-extrabold px-6 py-2 rounded-xl text-xs active:scale-95 transition">Copy Link</button>
+      </div>
+      <div class="flex gap-2 mb-5">
+        <button onclick="showView('view-sourcer-profile')" class="w-full bg-white/5 border border-white/10 text-white font-extrabold py-3 rounded-xl text-xs active:scale-95 transition">Payout Settings</button>
+      </div>
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">My Referrals</h2>
+        <span class="text-[10px] text-slate-500 font-bold" id="sourcerCount">0 Total</span>
+      </div>
+      <div id="sourcerLeadsList" class="space-y-3"></div>
+    </div>
+  </section>
+
+  <section id="view-sourcer-profile" class="view hidden bg-navy">
+    <div class="max-w-md mx-auto px-5 pt-6 safe-bottom">
+      <button onclick="showView('view-sourcer-dash')" class="mb-4 text-slate-400 text-sm">← Back to Dashboard</button>
+      <h2 class="text-xl font-extrabold mb-6">Payout Settings</h2>
+      <p class="text-xs text-slate-400 mb-4">Enter your bank details or USDT wallet to receive your $3 per unlock earnings.</p>
+      <form id="sourcerProfileForm" class="space-y-4">
+        <div class="card p-4 space-y-4 bg-navysoft">
+          <div><label class="label">Bank Name</label><input class="input" name="bank_name" placeholder="e.g. Access Bank"></div>
+          <div><label class="label">Account Number</label><input class="input" name="account_number" placeholder="0123456789"></div>
+          <div><label class="label">Account Name</label><input class="input" name="account_name" placeholder="John Doe"></div>
+        </div>
+        <div class="text-center text-[10px] text-slate-500 font-bold uppercase py-2">OR</div>
+        <div class="card p-4 bg-navysoft"><label class="label">USDT Wallet Address (TRC-20)</label><input class="input" name="wallet_address" placeholder="T..."></div>
+        <button type="submit" class="btn mt-2">Save Payout Details</button>
+      </form>
+    </div>
+  </section>
+
+  <div id="loadingOverlay" class="fixed inset-0 bg-navy/90 z-50 hidden flex items-center justify-center flex-col">
+    <div class="spinner mb-4"></div><p class="font-bold text-gold">Processing...</p>
+  </div>
+
+</div>
+
+<script>
+  const SUPABASE_URL = "https://fnpccciwbwrragpnzyqc.supabase.co";
+  const SUPABASE_KEY = "sb_publishable_i1BSTJbZ1nWkMzxJ0NZj-g_mMRA6wvZ";
+  const tg = window.Telegram?.WebApp;
+  const TG_ID = tg?.initDataUnsafe?.user?.id || null;
+  // Referral link settings (must match BotFather: /myapps)
+  const BOT_USERNAME = "iworldbridge_bot";
+  const APP_SHORT_NAME = "apply";
+  let cart = [];
+  let currentOrderRef = '';
+
+  if (tg) { tg.ready(); tg.expand(); }
+
+  // Finds the referral code from the link, and remembers it so it isn't lost
+  function getRefCode() {
+    let sp = tg?.initDataUnsafe?.start_param || '';
+    if (!sp) {
+      try {
+        sp = new URLSearchParams(location.search).get('tgWebAppStartParam')
+          || new URLSearchParams(location.hash.replace(/^#/, '')).get('tgWebAppStartParam') || '';
+      } catch (e) {}
+    }
+    try {
+      if (sp && sp.startsWith('ref_')) localStorage.setItem('wb_ref', sp);
+      else if (!sp) sp = localStorage.getItem('wb_ref') || '';
+    } catch (e) {}
+    return (sp && sp.startsWith('ref_')) ? sp.replace('ref_', '') : null;
+  }
+
+  // Asks the database to attach the referral to this worker (safe to repeat)
+  async function attachReferral() {
+    const code = getRefCode();
+    if (!TG_ID || !code) return;
+    try {
+      const r = await rpc('attach_referral', { p_worker_tg_id: TG_ID, p_code: code });
+      if (['attached', 'already', 'self', 'bad_code'].includes(r[0])) {
+        try { localStorage.removeItem('wb_ref'); } catch (e) {}
+      }
+    } catch (e) { console.error('attach_referral', e); }
+  }
+
+  // Reads ?startapp=ref_CODE and returns the sourcer's Telegram ID (or null)
+  async function getReferrerId() {
+    const sp = tg?.initDataUnsafe?.start_param;
+    if (!sp || !sp.startsWith('ref_')) return null;
+    try {
+      const r = await rpc('get_sourcer_id_by_code', { p_code: sp.replace('ref_', '') });
+      if (!r || r[0] === undefined || r[0] === null) return null;
+      const v = (typeof r[0] === 'object') ? Object.values(r[0])[0] : r[0];
+      if (!v || String(v) === String(TG_ID)) return null; // no self-referrals
+      return v;
+    } catch (err) { console.error("Referral lookup failed", err); return null; }
+  }
+
+  // ---------- HELPERS ----------
+  function escapeHTML(str) {
+    if (str === null || str === undefined) return '';
+    return String(str).replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag]));
+  }
+
+  // Only allow http(s) links (blocks javascript: links)
+  function safeUrl(u) {
+    try {
+      const url = new URL(String(u).trim());
+      return (url.protocol === 'https:' || url.protocol === 'http:') ? url.href : '';
+    } catch (e) { return ''; }
+  }
+
+  // Empty strings -> null so the database stores clean values
+  function clean(obj) {
+    const out = {};
+    for (const k in obj) { const v = typeof obj[k] === 'string' ? obj[k].trim() : obj[k]; out[k] = (v === '') ? null : v; }
+    return out;
+  }
+
+  function needTelegram() {
+    if (TG_ID) return false;
+    alert("Please open WorldBridge from inside Telegram.");
+    return true;
+  }
+
+  // One checked request function. Throws on any failure so nothing fails silently.
+  async function api(path, method = 'GET', body = null, prefer = null) {
+    const headers = { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' };
+    if (prefer) headers.Prefer = prefer;
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, { method, headers, body: body ? JSON.stringify(body) : undefined });
+    const text = await res.text();
+    let out = null;
+    try { out = text ? JSON.parse(text) : null; } catch (e) { out = null; }
+    if (!res.ok) {
+      console.error(path, res.status, out);
+      throw new Error(out?.message || `Request failed (${res.status})`);
+    }
+    return out;
+  }
+
+  async function rpc(name, body) {
+    const out = await api(`rpc/${name}`, 'POST', body);
+    return Array.isArray(out) ? out : ((out !== null && out !== undefined) ? [out] : []);
+  }
+
+  // PATCH that also confirms a row was really updated
+  async function patchRow(path, body) {
+    const rows = await api(path, 'PATCH', body, 'return=representation');
+    if (!rows || rows.length === 0) throw new Error("Nothing was updated. Your profile was not found.");
+    return rows;
+  }
+
+  function showView(id) {
+    document.querySelectorAll('.view').forEach(el => el.classList.add('hidden'));
+    document.getElementById(id).classList.remove('hidden');
+    window.scrollTo(0, 0);
+  }
+  function loading(show) { document.getElementById('loadingOverlay').classList.toggle('hidden', !show); }
+
+  function fail(e, prefix) {
+    loading(false);
+    alert((prefix ? prefix + ": " : "") + (e && e.message ? e.message : "Something went wrong. Please try again."));
+  }
+
+  // ---------- AUTO-LOGIN ----------
+  async function checkAutoLogin() {
+    if (!TG_ID) { showView('view-role'); return; }
+    loading(true);
+    try {
+      const data = await rpc('check_user_role', { p_tg_id: TG_ID });
+      loading(false);
+      const role = data[0] && data[0].role;
+
+      if (role === 'worker') { loadWorkerDash(); return; }
+      if (role === 'recruiter') {
+        document.getElementById('recruiterNameDisplay').textContent = data[0].company_name || 'Recruiter';
+        showView('view-recruiter-dash'); loadRecruiterLeads(); return;
+      }
+      if (role === 'agent') { showView('view-agent-dash'); loadAgentDash(); return; }
+      if (role === 'sourcer') { showView('view-sourcer-dash'); loadSourcerDash(); return; }
+      showView('view-role');
+    } catch (e) { console.error(e); loading(false); showView('view-role'); }
+  }
+
+  function selectRole(role) {
+    if (needTelegram()) return;
+    if (role === 'worker') showView('view-worker-reg');
+    if (role === 'recruiter') showView('view-recruiter-reg');
+    if (role === 'agent') showView('view-agent-reg');
+    if (role === 'sourcer') showView('view-sourcer-reg');
+  }
+
+  // ---------- WORKER ----------
+  document.getElementById('workerForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (needTelegram()) return;
+    loading(true);
+    try {
+      const data = clean(Object.fromEntries(new FormData(e.target).entries()));
+      data.added_by_role = 'worker'; data.telegram_id = TG_ID; data.location = 'Nigeria';
+
+      // Already registered? Update instead of creating a duplicate.
+      let existing = [];
+      try { existing = await api(`gulf_leads?telegram_id=eq.${TG_ID}&select=id,referred_by_sourcer_tg_id`) || []; } catch (err) { existing = []; }
+
+      if (existing.length > 0) {
+        delete data.added_by_role; delete data.telegram_id;
+        // Attach a referral only if this worker doesn't already have one
+        if (!existing[0].referred_by_sourcer_tg_id) {
+          const refId = await getReferrerId();
+          if (refId) data.referred_by_sourcer_tg_id = refId;
+        }
+        await patchRow(`gulf_leads?telegram_id=eq.${TG_ID}`, data);
+      } else {
+        const refId = await getReferrerId();
+        if (refId) data.referred_by_sourcer_tg_id = refId;
+        await api('gulf_leads', 'POST', data, 'return=minimal');
+      }
+      await attachReferral();
+      loading(false); alert("Application submitted!"); loadWorkerDash();
+    } catch (err) { fail(err, "Could not submit application"); }
+  });
+
+  async function loadWorkerDash() {
+    loadNotifications('workerNotifs');
+    showView('view-worker-dash');
+    if (!TG_ID) return;
+    try {
+      const data = await api(`gulf_leads?telegram_id=eq.${TG_ID}&select=*`) || [];
+      const link = data.length > 0 ? safeUrl(data[0].cv) : '';
+      if (link) {
+        document.getElementById('workerCvUpdate').value = link;
+        document.getElementById('cvStatus').innerHTML = `<a href="${escapeHTML(link)}" target="_blank" rel="noopener" class="text-gold underline font-bold">✓ View Current CV</a>`;
+      }
+    } catch (e) { console.error(e); }
+  }
+
+  async function updateWorkerCv() {
+    if (needTelegram()) return;
+    const cv = safeUrl(document.getElementById('workerCvUpdate').value);
+    if (!cv) { alert("Please paste a valid link starting with https://"); return; }
+    try {
+      await patchRow(`gulf_leads?telegram_id=eq.${TG_ID}`, { cv });
+      document.getElementById('cvStatus').innerHTML = `<a href="${escapeHTML(cv)}" target="_blank" rel="noopener" class="text-gold underline font-bold">✓ View Current CV</a>`;
+      alert("CV Updated!");
+    } catch (e) { fail(e, "Could not save CV"); }
+  }
+
+  // ---------- RECRUITER ----------
+  document.getElementById('recruiterForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (needTelegram()) return;
+    loading(true);
+    try {
+      const data = clean(Object.fromEntries(new FormData(e.target).entries()));
+      data.telegram_id = TG_ID;
+
+      let existing = [];
+      try { existing = await api(`recruiters?telegram_id=eq.${TG_ID}&select=id`) || []; } catch (err) { existing = []; }
+
+      if (existing.length > 0) {
+        delete data.telegram_id;
+        await patchRow(`recruiters?telegram_id=eq.${TG_ID}`, data);
+      } else {
+        await api('recruiters', 'POST', data, 'return=minimal');
+      }
+      loading(false);
+      document.getElementById('recruiterNameDisplay').textContent = data.company_name;
+      showView('view-recruiter-dash'); loadRecruiterLeads();
+    } catch (err) { fail(err, "Could not create account"); }
+  });
+
+  let leadsTimer = null;
+  function debouncedLoadLeads() { clearTimeout(leadsTimer); leadsTimer = setTimeout(loadRecruiterLeads, 350); }
+
+  async function loadRecruiterLeads() {
+    const job = document.getElementById('searchJob').value.trim();
+    const qual = document.getElementById('searchQual').value.trim();
+    let path = `recruiter_lead_preview?select=*`;
+    if (job) path += `&job=ilike.*${encodeURIComponent(job)}*`;
+    if (qual) path += `&qualification=ilike.*${encodeURIComponent(qual)}*`;
+
+    const box = document.getElementById('recruiterLeadsList');
+    try {
+      const leads = await api(path) || [];
+      if (leads.length === 0) {
+        box.innerHTML = `<div class="card p-6 text-center border-dashed border-white/20 bg-transparent"><p class="text-xs text-slate-500">No candidates found matching your search.</p></div>`;
+        return;
+      }
+      box.innerHTML = leads.map(l => `
+        <div class="card p-4 flex gap-3 items-center bg-navysoft/50">
+          <input type="checkbox" value="${escapeHTML(l.id)}" ${cart.includes(String(l.id)) ? 'checked' : ''} onchange="toggleCart(this)" class="w-5 h-5 accent-gold rounded cursor-pointer">
+          <div class="flex-1 cursor-pointer" onclick="this.parentElement.querySelector('input').click()">
+            <p class="font-bold text-[13.5px]">${escapeHTML(l.name_masked)}</p>
+            <p class="text-[11px] text-slate-400">${escapeHTML(l.job)} · ${escapeHTML(l.qualification)} · ${escapeHTML(l.experience)}</p>
+          </div>
+          <div class="text-emerald-400 text-[9px] font-extrabold tracking-wider px-2 py-1 bg-emerald-500/10 rounded border border-emerald-500/20">${l.passport ? 'PASSPORT ✓' : 'NO PP'}</div>
+        </div>
+      `).join('');
+    } catch (e) {
+      console.error(e);
+      box.innerHTML = `<div class="card p-6 text-center border-dashed border-white/20 bg-transparent"><p class="text-xs text-slate-500">Could not load candidates. Please reopen the app.</p></div>`;
+    }
+  }
+
+  function updateCartBanner() {
+    const banner = document.getElementById('cartBanner');
+    if (cart.length > 0) {
+      banner.classList.remove('hidden');
+      document.getElementById('cartTotal').textContent = `${cart.length} Leads Selected`;
+    } else banner.classList.add('hidden');
+  }
+
+  function toggleCart(cb) {
+    const id = String(cb.value);
+    if (cb.checked) { if (!cart.includes(id)) cart.push(id); }
+    else cart = cart.filter(x => x !== id);
+    updateCartBanner();
+  }
+
+  function calculatePrice(count) {
+    const buckets = Math.floor(count / 5);
+    const rem = count % 5;
+    let price = buckets * 80;
+    if (rem === 1) price += 20;
+    if (rem === 2) price += 40;
+    if (rem === 3) price += 50;
+    if (rem === 4) price += 60;
+    return price;
+  }
+
+  async function checkoutCart() {
+    if (cart.length === 0) return;
+    if (needTelegram()) return;
+    const finalPrice = (calculatePrice(cart.length) * 0.9).toFixed(2);
+    const uniqueAmount = (parseFloat(finalPrice) + (Math.random() * 0.05)).toFixed(4);
+    loading(true);
+    try {
+      const out = await rpc('process_checkout', { r_tg_id: TG_ID, lead_ids_arr: cart, total_usd: parseFloat(uniqueAmount) });
+      const r = out[0];
+      const ref = (r && typeof r === 'object') ? (r.reference || Object.values(r)[0]) : r;
+      if (!ref) throw new Error("Order was not created. Please try again.");
+      currentOrderRef = String(ref);
+      document.getElementById('checkoutAmount').textContent = `${uniqueAmount} USDT`;
+      loading(false); showView('view-checkout');
+    } catch (e) { fail(e, "Checkout failed"); }
+  }
+
+  async function claimPayment() {
+    if (!currentOrderRef) { alert("No active order. Please select leads and checkout again."); showView('view-recruiter-dash'); return; }
+    loading(true);
+    try {
+      await patchRow(`orders?reference=eq.${encodeURIComponent(currentOrderRef)}`, { status: 'claimed' });
+      loading(false);
+      alert("Payment claimed! Admin will verify.");
+      cart = []; currentOrderRef = ''; updateCartBanner();
+      showView('view-recruiter-dash'); loadRecruiterLeads();
+    } catch (e) { fail(e, "Could not claim payment"); }
+  }
+
+  // ---------- AGENT ----------
+  document.getElementById('agentRegForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (needTelegram()) return;
+    loading(true);
+    try {
+      const data = clean(Object.fromEntries(new FormData(e.target).entries()));
+      await rpc('create_agent_profile', {
+        p_name: data.name,
+        p_email: data.email,
+        p_phone: data.phone,
+        p_address: data.address,
+        p_candidate_pool: data.candidate_pool,
+        p_tg_id: TG_ID
+      });
+      loading(false);
+      showView('view-agent-dash'); loadAgentDash();
+    } catch (err) { fail(err, "Could not register agent"); }
+  });
+
+  async function loadAgentDash() {
+    const notifMap = await loadNotifications('agentNotifs');
+    if (!TG_ID) return;
+    try {
+      const data = await api(`agents?telegram_id=eq.${TG_ID}`) || [];
+      if (data.length > 0) document.getElementById('agentEarnings').textContent = data[0].total_earnings ?? 0;
+    } catch (e) { console.error(e); }
+
+    const list = document.getElementById('agentLeadsList');
+    try {
+      const leads = await rpc('get_agent_candidates', { p_agent_tg_id: TG_ID });
+      document.getElementById('agentCount').textContent = `${leads.length} Total`;
+
+      if (leads.length === 0) {
+        list.innerHTML = `<div class="card p-8 text-center border-dashed border-gold/30 bg-gold/5"><p class="text-sm font-bold text-gold mb-1">No Candidates Yet</p><p class="text-xs text-slate-400 mb-4">Upload your first candidate to start earning $1 per unlock.</p><button onclick="showView('view-agent-add')" class="bg-gold text-navy font-extrabold px-4 py-2 rounded-lg text-xs">Add Candidate</button></div>`;
+        return;
+      }
+
+      list.innerHTML = leads.map(l => `
+        <div class="card p-4 bg-navysoft/50">
+          <div class="flex justify-between items-start mb-2">
+            <div>
+              <p class="font-bold text-[13.5px]">${escapeHTML(l.name)}</p>
+              <p class="text-[11px] text-slate-400">${escapeHTML(l.job)} · ${escapeHTML(l.qualification)}</p>
+            </div>
+            <span class="text-[9px] font-extrabold px-2 py-1 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">${escapeHTML(statusLabel(l, notifMap))}</span>
+          </div>
+          <p class="text-[11px] text-slate-500 mt-2 font-mono">📞 ${escapeHTML(l.phone)}</p>
+          ${notifMap[String(l.id)] ? `<p class="text-[11px] text-gold mt-1 font-semibold">🏢 Unlocked by ${escapeHTML(notifMap[String(l.id)])}. Candidate will be contacted soon.</p>` : ''}
+        </div>
+      `).join('');
+    } catch (e) {
+      console.error(e);
+      list.innerHTML = `<div class="card p-6 text-center border-dashed border-white/20 bg-transparent"><p class="text-xs text-slate-500">Could not load your candidates. Please reopen the app.</p></div>`;
+    }
+  }
+
+  document.getElementById('agentAddForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (needTelegram()) return;
+    loading(true);
+    try {
+      const data = clean(Object.fromEntries(new FormData(e.target).entries()));
+      await rpc('agent_add_candidate', {
+        p_agent_tg_id: TG_ID,
+        p_name: data.name,
+        p_phone: data.phone,
+        p_email: data.email,
+        p_job: data.job,
+        p_qualification: data.qualification,
+        p_experience: data.experience,
+        p_cv: data.cv
+      });
+      loading(false);
+      e.target.reset();
+      showView('view-agent-dash'); loadAgentDash();
+    } catch (err) { fail(err, "Could not add candidate"); }
+  });
+
+  document.getElementById('agentProfileForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (needTelegram()) return;
+    loading(true);
+    try {
+      const data = clean(Object.fromEntries(new FormData(e.target).entries()));
+      await patchRow(`agents?telegram_id=eq.${TG_ID}`, data);
+      loading(false); alert("Payout details saved!"); showView('view-agent-dash');
+    } catch (err) { fail(err, "Could not save payout details"); }
+  });
+
+  // ---------- SOURCER ----------
+  document.getElementById('sourcerRegForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (needTelegram()) return;
+    loading(true);
+    try {
+      const data = clean(Object.fromEntries(new FormData(e.target).entries()));
+      await rpc('create_sourcer_profile', {
+        p_name: data.name,
+        p_email: data.email,
+        p_phone: data.phone,
+        p_address: data.address,
+        p_traffic_source: data.traffic_source,
+        p_tg_id: TG_ID
+      });
+      loading(false); showView('view-sourcer-dash'); loadSourcerDash();
+    } catch (err) { fail(err, "Could not register sourcer"); }
+  });
+
+  async function loadSourcerDash() {
+    loadNotifications('sourcerNotifs');
+    if (!TG_ID) return;
+    try {
+      const data = await rpc('get_sourcer_profile', { p_tg_id: TG_ID });
+      if (data && data.length > 0) {
+        document.getElementById('sourcerEarnings').textContent = data[0].total_earnings ?? 0;
+        document.getElementById('refLink').textContent = `https://t.me/${BOT_USERNAME}/${APP_SHORT_NAME}?startapp=ref_${data[0].referral_code}`;
+      }
+    } catch (e) { console.error(e); }
+
+    const list = document.getElementById('sourcerLeadsList');
+    try {
+      const leads = await rpc('get_sourcer_referrals', { p_sourcer_tg_id: TG_ID });
+      document.getElementById('sourcerCount').textContent = `${leads.length} Referrals`;
+
+      if (leads.length === 0) {
+        list.innerHTML = `<div class="card p-8 text-center border-dashed border-white/20 bg-transparent"><p class="text-sm font-bold text-slate-300 mb-1">No Referrals Yet</p><p class="text-xs text-slate-500 mb-4">Share your unique link with workers. When a recruiter unlocks them, you earn $3.</p><button onclick="copyRefLink()" class="bg-white/10 text-white font-bold px-4 py-2 rounded-lg text-xs border border-white/10">Copy My Link</button></div>`;
+        return;
+      }
+
+      list.innerHTML = leads.map(l => `
+        <div class="card p-4 bg-navysoft/50">
+          <div class="flex justify-between items-start">
+            <div>
+              <p class="font-bold text-[13.5px]">${escapeHTML(l.name)}</p>
+              <p class="text-[11px] text-slate-400">${escapeHTML(l.job)} · ${escapeHTML(l.location || 'Nigeria')}</p>
+            </div>
+            <span class="text-[9px] font-extrabold px-2 py-1 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">${String(l.status || '').toLowerCase() === 'unlocked' ? 'UNLOCKED' : (l.passport ? 'PASSPORT ✓' : 'REFERRED')}</span>
+          </div>
+        </div>
+      `).join('');
+    } catch (e) {
+      console.error(e);
+      list.innerHTML = `<div class="card p-6 text-center border-dashed border-white/20 bg-transparent"><p class="text-xs text-slate-500">Could not load referrals. Please reopen the app.</p></div>`;
+    }
+  }
+
+  function copyRefLink() {
+    const link = document.getElementById('refLink').textContent;
+    if (!link || link === 'Loading...') return;
+    const done = () => alert('Referral link copied to clipboard!');
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(link).then(done).catch(() => fallbackCopy(link, done));
+    } else fallbackCopy(link, done);
+  }
+  function fallbackCopy(text, done) {
+    const ta = document.createElement('textarea');
+    ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); done(); } catch (e) { alert(text); }
+    document.body.removeChild(ta);
+  }
+
+  document.getElementById('sourcerProfileForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (needTelegram()) return;
+    loading(true);
+    try {
+      const data = clean(Object.fromEntries(new FormData(e.target).entries()));
+      await patchRow(`sourcers?telegram_id=eq.${TG_ID}`, data);
+      loading(false); alert("Payout details saved!"); showView('view-sourcer-dash');
+    } catch (err) { fail(err, "Could not save payout details"); }
+  });
+
+  // ---------- NOTIFICATIONS ----------
+  // Shows recruiter-interest alerts. Returns { leadId: recruiterName } for tracking purchases.
+  async function loadNotifications(boxId) {
+    const map = {};
+    const box = document.getElementById(boxId);
+    if (!TG_ID || !box) return map;
+    try {
+      const items = await rpc('get_my_notifications', { p_tg_id: TG_ID });
+      items.forEach(n => { if (n.lead_id && n.recruiter_name) map[String(n.lead_id)] = n.recruiter_name; });
+      const showHeading = boxId !== 'workerNotifs';
+
+      if (items.length === 0) {
+        if (showHeading) {
+          box.innerHTML = `<h2 class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-3">Notifications</h2><div class="card p-4 text-center border-dashed border-white/20 bg-transparent"><p class="text-xs text-slate-500">No notifications yet. You'll see it here when a recruiter shows interest.</p></div>`;
+        }
+        return map;
+      }
+
+      const unread = items.filter(n => !n.is_read).length;
+      const heading = showHeading
+        ? `<div class="flex items-center justify-between mb-3"><h2 class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Notifications</h2>${unread ? `<span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-gold text-navy">${unread} NEW</span>` : ''}</div>`
+        : '';
+      box.innerHTML = heading + `<div class="space-y-2">` + items.slice(0, 20).map(n => `
+        <div class="card p-3 ${n.is_read ? '' : 'border-gold/40 bg-gold/5'}">
+          <p class="text-[12.5px] font-bold">${escapeHTML(n.title || 'Update')}</p>
+          <p class="text-[11.5px] text-slate-300 mt-0.5">${escapeHTML(n.message)}</p>
+          <p class="text-[9.5px] text-slate-500 mt-1">${n.created_at ? escapeHTML(new Date(n.created_at).toLocaleString()) : ''}</p>
+        </div>`).join('') + `</div>`;
+
+      if (unread) rpc('mark_notifications_read', { p_tg_id: TG_ID }).catch(() => {});
+    } catch (e) { console.error(e); }
+    return map;
+  }
+
+  function statusLabel(lead, notifMap) {
+    if (notifMap[String(lead.id)] || String(lead.status || '').toLowerCase() === 'unlocked') return 'UNLOCKED';
+    return String(lead.status || 'pending').toUpperCase();
+  }
+
+  // INIT
+  attachReferral();
+  checkAutoLogin();
+</script>
+</body>
+</html>
