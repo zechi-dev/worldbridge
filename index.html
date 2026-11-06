@@ -139,7 +139,7 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
       <div>
         <h2 class="font-bold text-[14px] mb-3">Notifications</h2>
         <div class="card p-6 text-center border-dashed border-white/20 bg-transparent">
-          <p class="text-xs text-slate-500">No new interview invites or requests yet.</p>
+          <div id="workerNotifs"><p class="text-xs text-slate-500">No new interview invites or requests yet.</p></div>
         </div>
       </div>
     </div>
@@ -222,6 +222,7 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
       <div><h1 class="font-extrabold text-[16px]">Agent Dashboard</h1><p class="text-[10px] text-gold font-bold tracking-wider uppercase">Total Earnings: $<span id="agentEarnings">0</span></p></div>
     </header>
     <div class="max-w-md mx-auto px-4 py-5">
+      <div id="agentNotifs" class="mb-5"></div>
       <div class="flex gap-2 mb-6">
         <button onclick="showView('view-agent-add')" class="flex-1 bg-gold text-navy font-extrabold py-3 rounded-xl text-xs shadow-lg shadow-gold/20 active:scale-95 transition">+ Add New Candidate</button>
         <button onclick="showView('view-agent-profile')" class="flex-1 bg-white/5 border border-white/10 text-white font-extrabold py-3 rounded-xl text-xs active:scale-95 transition">Payout Settings</button>
@@ -294,6 +295,7 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
       <div><h1 class="font-extrabold text-[16px]">Sourcer Dashboard</h1><p class="text-[10px] text-emerald-400 font-bold tracking-wider uppercase">Total Earnings: $<span id="sourcerEarnings">0</span></p></div>
     </header>
     <div class="max-w-md mx-auto px-4 py-5">
+      <div id="sourcerNotifs" class="mb-5"></div>
       <div class="card p-5 text-center mb-5 border-gold/30 bg-gradient-to-b from-gold/10 to-transparent">
         <p class="text-[10px] text-slate-400 uppercase font-bold tracking-widest mb-2">Your Unique Referral Link</p>
         <p class="text-[12px] font-mono text-gold break-all bg-navy/50 p-3 rounded-lg border border-gold/20 mb-3" id="refLink">Loading...</p>
@@ -339,10 +341,26 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
   const SUPABASE_KEY = "sb_publishable_i1BSTJbZ1nWkMzxJ0NZj-g_mMRA6wvZ";
   const tg = window.Telegram?.WebApp;
   const TG_ID = tg?.initDataUnsafe?.user?.id || null;
+  // Referral link settings (must match BotFather: /myapps)
+  const BOT_USERNAME = "iworldbridge_bot";
+  const APP_SHORT_NAME = "apply";
   let cart = [];
   let currentOrderRef = '';
 
   if (tg) { tg.ready(); tg.expand(); }
+
+  // Reads ?startapp=ref_CODE and returns the sourcer's Telegram ID (or null)
+  async function getReferrerId() {
+    const sp = tg?.initDataUnsafe?.start_param;
+    if (!sp || !sp.startsWith('ref_')) return null;
+    try {
+      const r = await rpc('get_sourcer_id_by_code', { p_code: sp.replace('ref_', '') });
+      if (!r || r[0] === undefined || r[0] === null) return null;
+      const v = (typeof r[0] === 'object') ? Object.values(r[0])[0] : r[0];
+      if (!v || String(v) === String(TG_ID)) return null; // no self-referrals
+      return v;
+    } catch (err) { console.error("Referral lookup failed", err); return null; }
+  }
 
   // ---------- HELPERS ----------
   function escapeHTML(str) {
@@ -449,23 +467,19 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
 
       // Already registered? Update instead of creating a duplicate.
       let existing = [];
-      try { existing = await api(`gulf_leads?telegram_id=eq.${TG_ID}&select=id`) || []; } catch (err) { existing = []; }
+      try { existing = await api(`gulf_leads?telegram_id=eq.${TG_ID}&select=id,referred_by_sourcer_tg_id`) || []; } catch (err) { existing = []; }
 
       if (existing.length > 0) {
         delete data.added_by_role; delete data.telegram_id;
+        // Attach a referral only if this worker doesn't already have one
+        if (!existing[0].referred_by_sourcer_tg_id) {
+          const refId = await getReferrerId();
+          if (refId) data.referred_by_sourcer_tg_id = refId;
+        }
         await patchRow(`gulf_leads?telegram_id=eq.${TG_ID}`, data);
       } else {
-        // Capture referral code from the Telegram start link
-        const startParam = tg?.initDataUnsafe?.start_param;
-        if (startParam && startParam.startsWith('ref_')) {
-          const refCode = startParam.replace('ref_', '');
-          try {
-            const r = await rpc('get_sourcer_id_by_code', { p_code: refCode });
-            if (r && r[0] !== undefined && r[0] !== null) {
-              data.referred_by_sourcer_tg_id = (typeof r[0] === 'object') ? Object.values(r[0])[0] : r[0];
-            }
-          } catch (err) { console.error("Referral lookup failed", err); }
-        }
+        const refId = await getReferrerId();
+        if (refId) data.referred_by_sourcer_tg_id = refId;
         await api('gulf_leads', 'POST', data, 'return=minimal');
       }
       loading(false); alert("Application submitted!"); loadWorkerDash();
@@ -473,6 +487,7 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
   });
 
   async function loadWorkerDash() {
+    loadNotifications('workerNotifs');
     showView('view-worker-dash');
     if (!TG_ID) return;
     try {
@@ -629,6 +644,7 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
   });
 
   async function loadAgentDash() {
+    const notifMap = await loadNotifications('agentNotifs');
     if (!TG_ID) return;
     try {
       const data = await api(`agents?telegram_id=eq.${TG_ID}`) || [];
@@ -652,9 +668,10 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
               <p class="font-bold text-[13.5px]">${escapeHTML(l.name)}</p>
               <p class="text-[11px] text-slate-400">${escapeHTML(l.job)} · ${escapeHTML(l.qualification)}</p>
             </div>
-            <span class="text-[9px] font-extrabold px-2 py-1 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">${escapeHTML((l.status || 'pending').toUpperCase())}</span>
+            <span class="text-[9px] font-extrabold px-2 py-1 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">${escapeHTML(statusLabel(l, notifMap))}</span>
           </div>
           <p class="text-[11px] text-slate-500 mt-2 font-mono">📞 ${escapeHTML(l.phone)}</p>
+          ${notifMap[String(l.id)] ? `<p class="text-[11px] text-gold mt-1 font-semibold">🏢 Unlocked by ${escapeHTML(notifMap[String(l.id)])}. Candidate will be contacted soon.</p>` : ''}
         </div>
       `).join('');
     } catch (e) {
@@ -716,12 +733,13 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
   });
 
   async function loadSourcerDash() {
+    loadNotifications('sourcerNotifs');
     if (!TG_ID) return;
     try {
       const data = await rpc('get_sourcer_profile', { p_tg_id: TG_ID });
       if (data && data.length > 0) {
         document.getElementById('sourcerEarnings').textContent = data[0].total_earnings ?? 0;
-        document.getElementById('refLink').textContent = `t.me/WorldBridgeBot/apply?startapp=ref_${data[0].referral_code}`;
+        document.getElementById('refLink').textContent = `https://t.me/${BOT_USERNAME}/${APP_SHORT_NAME}?startapp=ref_${data[0].referral_code}`;
       }
     } catch (e) { console.error(e); }
 
@@ -742,7 +760,7 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
               <p class="font-bold text-[13.5px]">${escapeHTML(l.name)}</p>
               <p class="text-[11px] text-slate-400">${escapeHTML(l.job)} · ${escapeHTML(l.location || 'Nigeria')}</p>
             </div>
-            <span class="text-[9px] font-extrabold px-2 py-1 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">${l.passport ? 'PASSPORT ✓' : 'REFERRED'}</span>
+            <span class="text-[9px] font-extrabold px-2 py-1 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">${String(l.status || '').toLowerCase() === 'unlocked' ? 'UNLOCKED' : (l.passport ? 'PASSPORT ✓' : 'REFERRED')}</span>
           </div>
         </div>
       `).join('');
@@ -778,6 +796,45 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
       loading(false); alert("Payout details saved!"); showView('view-sourcer-dash');
     } catch (err) { fail(err, "Could not save payout details"); }
   });
+
+  // ---------- NOTIFICATIONS ----------
+  // Shows recruiter-interest alerts. Returns { leadId: recruiterName } for tracking purchases.
+  async function loadNotifications(boxId) {
+    const map = {};
+    const box = document.getElementById(boxId);
+    if (!TG_ID || !box) return map;
+    try {
+      const items = await rpc('get_my_notifications', { p_tg_id: TG_ID });
+      items.forEach(n => { if (n.lead_id && n.recruiter_name) map[String(n.lead_id)] = n.recruiter_name; });
+      const showHeading = boxId !== 'workerNotifs';
+
+      if (items.length === 0) {
+        if (showHeading) {
+          box.innerHTML = `<h2 class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-3">Notifications</h2><div class="card p-4 text-center border-dashed border-white/20 bg-transparent"><p class="text-xs text-slate-500">No notifications yet. You'll see it here when a recruiter shows interest.</p></div>`;
+        }
+        return map;
+      }
+
+      const unread = items.filter(n => !n.is_read).length;
+      const heading = showHeading
+        ? `<div class="flex items-center justify-between mb-3"><h2 class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Notifications</h2>${unread ? `<span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-gold text-navy">${unread} NEW</span>` : ''}</div>`
+        : '';
+      box.innerHTML = heading + `<div class="space-y-2">` + items.slice(0, 20).map(n => `
+        <div class="card p-3 ${n.is_read ? '' : 'border-gold/40 bg-gold/5'}">
+          <p class="text-[12.5px] font-bold">${escapeHTML(n.title || 'Update')}</p>
+          <p class="text-[11.5px] text-slate-300 mt-0.5">${escapeHTML(n.message)}</p>
+          <p class="text-[9.5px] text-slate-500 mt-1">${n.created_at ? escapeHTML(new Date(n.created_at).toLocaleString()) : ''}</p>
+        </div>`).join('') + `</div>`;
+
+      if (unread) rpc('mark_notifications_read', { p_tg_id: TG_ID }).catch(() => {});
+    } catch (e) { console.error(e); }
+    return map;
+  }
+
+  function statusLabel(lead, notifMap) {
+    if (notifMap[String(lead.id)] || String(lead.status || '').toLowerCase() === 'unlocked') return 'UNLOCKED';
+    return String(lead.status || 'pending').toUpperCase();
+  }
 
   // INIT
   checkAutoLogin();
