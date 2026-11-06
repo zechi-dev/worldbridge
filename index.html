@@ -100,7 +100,7 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
           </button>
         </div>
       </div>
-      <div class="mb-8"><p class="text-center text-[10px] text-slate-500">WorldBridge Manpower Consultancy · Dubai, UAE</p></div>
+      <div class="mb-8"><p class="text-center text-[10px] text-slate-500">WorldBridge Manpower Consultancy · Dubai, UAE · v3</p></div>
     </div>
   </section>
 
@@ -109,6 +109,7 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
     <div class="max-w-md mx-auto px-5 pt-8 safe-bottom">
       <button onclick="showView('view-role')" class="mb-4 text-slate-400 text-sm">← Back</button>
       <h2 class="text-xl font-extrabold mb-4">Worker Registration</h2>
+      <p id="refNote" class="text-[11px] text-emerald-400 font-bold mb-3"></p>
       <form id="workerForm" class="space-y-4">
         <input class="input" name="name" placeholder="Full Name" required>
         <input class="input" name="phone" type="tel" placeholder="WhatsApp Number" required>
@@ -478,7 +479,11 @@ tailwind.config = { theme: { extend: { colors:{navy:'#0F172A',navysoft:'#16213B'
 
   function selectRole(role) {
     if (needTelegram()) return;
-    if (role === 'worker') showView('view-worker-reg');
+    if (role === 'worker') {
+      const c = getRefCode();
+      document.getElementById('refNote').textContent = c ? `✓ Referral code detected: ${c}` : '';
+      showView('view-worker-reg');
+    }
     if (role === 'recruiter') showView('view-recruiter-reg');
     if (role === 'agent') showView('view-agent-reg');
     if (role === 'sourcer') showView('view-sourcer-reg');
